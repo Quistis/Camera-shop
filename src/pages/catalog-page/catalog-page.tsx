@@ -1,10 +1,16 @@
 import { useAppSelector } from '../../hooks';
-import { selectCameraCards } from '../../store/slices/cameras';
+import { selectCameraCards, selectCardsLoadingStatus } from '../../store/slices/cameras';
 import Banner from '../../components/banner/banner';
 import ProductsList from '../../components/products-list/products-list';
+import Loader from '../../components/loader/loader';
 
 const CatalogPage = (): JSX.Element => {
   const cardsData = useAppSelector(selectCameraCards);
+  const isLoading = useAppSelector(selectCardsLoadingStatus);
+
+  if (isLoading) {
+    return <Loader/>;
+  }
 
   return (
     <main>

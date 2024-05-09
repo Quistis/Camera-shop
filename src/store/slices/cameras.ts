@@ -43,4 +43,6 @@ export const CamerasSlice = createSlice({
 
 export const selectCameraCards = (state: State): TCamerasCard[] => state[NameSpace.Cameras].cards.cardsData;
 
+export const selectCardsLoadingStatus = (state: State): boolean => state[NameSpace.Cameras].cards.loadingStatus;
+
 export const camerasReducer = CamerasSlice.reducer;
