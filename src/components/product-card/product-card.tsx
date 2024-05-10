@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import StarRating from '../star-rating/star-rating';
 import { TCamerasCard } from '../../types/cameras';
 
@@ -6,7 +7,7 @@ type ProductCardsProps = {
 };
 
 const ProductCard = ({card}: ProductCardsProps): JSX.Element => {
-  const {name, category, price, rating, reviewCount, previewImg, previewImg2x, previewImgWebp, previewImgWebp2x} = card;
+  const {id, name, category, price, rating, reviewCount, previewImg, previewImg2x, previewImgWebp, previewImgWebp2x} = card;
 
   return (
     <div className="product-card">
@@ -41,9 +42,9 @@ const ProductCard = ({card}: ProductCardsProps): JSX.Element => {
         >
           Купить
         </button>
-        <a className="btn btn--transparent" href="#">
+        <Link className="btn btn--transparent" to={`product/${id}`}>
           Подробнее
-        </a>
+        </Link>
       </div>
     </div>
   );

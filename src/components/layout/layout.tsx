@@ -1,24 +1,25 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
+import { AppRoutes } from '../../const';
 
 const Layout = (): JSX.Element => (
   <div className="wrapper">
     <header className="header" id="header">
       <div className="container">
-        <a
+        <Link
           className="header__logo"
-          href="index.html"
+          to={AppRoutes.Main}
           aria-label="Переход на главную"
         >
           <svg width={100} height={36} aria-hidden="true">
             <use xlinkHref="#icon-logo" />
           </svg>
-        </a>
+        </Link>
         <nav className="main-nav header__main-nav">
           <ul className="main-nav__list">
             <li className="main-nav__item">
-              <a className="main-nav__link" href="catalog.html">
+              <Link className="main-nav__link" to={AppRoutes.Main}>
                 Каталог
-              </a>
+              </Link>
             </li>
             <li className="main-nav__item">
               <a className="main-nav__link" href="#">
@@ -37,7 +38,7 @@ const Layout = (): JSX.Element => (
             </li>
           </ul>
         </nav>
-        <div className="form-search">
+        {/* <div className="form-search">
           <form>
             <label>
               <svg
@@ -85,7 +86,7 @@ const Layout = (): JSX.Element => (
             <use xlinkHref="#icon-basket" />
           </svg>
           <span className="header__basket-count">3</span>
-        </a>
+        </a> */}
       </div>
     </header>
 
