@@ -1,3 +1,4 @@
+import StarRating from '../star-rating/star-rating';
 import { TCamerasCard } from '../../types/cameras';
 
 type ProductCardsProps = {
@@ -25,27 +26,7 @@ const ProductCard = ({card}: ProductCardsProps): JSX.Element => {
         </picture>
       </div>
       <div className="product-card__info">
-        <div className="rate product-card__rate">
-          <svg width={17} height={16} aria-hidden="true">
-            <use xlinkHref="#icon-full-star" />
-          </svg>
-          <svg width={17} height={16} aria-hidden="true">
-            <use xlinkHref="#icon-full-star" />
-          </svg>
-          <svg width={17} height={16} aria-hidden="true">
-            <use xlinkHref="#icon-full-star" />
-          </svg>
-          <svg width={17} height={16} aria-hidden="true">
-            <use xlinkHref="#icon-star" />
-          </svg>
-          <svg width={17} height={16} aria-hidden="true">
-            <use xlinkHref="#icon-star" />
-          </svg>
-          <p className="visually-hidden">Рейтинг: {rating}</p>
-          <p className="rate__count">
-            <span className="visually-hidden">Всего оценок:</span>{reviewCount}
-          </p>
-        </div>
+        <StarRating rating={rating} reviewCount={reviewCount}/>
         <p className="product-card__title">
           {name.includes('Ретрокамера') ? name : `${category} ${name}`}
         </p>
