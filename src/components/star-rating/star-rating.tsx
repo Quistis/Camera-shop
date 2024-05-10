@@ -5,10 +5,11 @@ const MAX_RATING = 5;
 type StarRatingProps = {
   rating: number;
   maxRating?: number;
-  reviewCount: number;
+  reviewCount?: number;
+  isCommentSection?: boolean;
 };
 //TODO: Подумать как тут не использовать индекс для значения ключей
-const StarRating = ({rating, maxRating = MAX_RATING, reviewCount}: StarRatingProps): JSX.Element => {
+const StarRating = ({rating, maxRating = MAX_RATING, reviewCount, isCommentSection = false}: StarRatingProps): JSX.Element => {
   const location = useLocation();
   const {id} = useParams();
   const isProductPage = location.pathname === `/product/${id ? id : ''}`;
@@ -27,9 +28,10 @@ const StarRating = ({rating, maxRating = MAX_RATING, reviewCount}: StarRatingPro
         </svg>
       ))}
       <p className="visually-hidden">Рейтинг: {rating}</p>
+      {!isCommentSection &&
       <p className="rate__count">
         <span className="visually-hidden">Всего оценок:</span>{reviewCount}
-      </p>
+      </p>}
     </div>
   );
 };
