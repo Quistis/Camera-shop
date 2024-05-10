@@ -3,6 +3,7 @@ import { AxiosInstance } from 'axios';
 // import {saveToken, dropToken} from '../services/token';
 import { AppDispatch, State } from '../types/state';
 import { TCamerasCard } from '../types/cameras';
+import { TReview } from '../types/reviews';
 import { APIRoute } from '../const';
 
 export const fetchCameras = createAsyncThunk<TCamerasCard[], undefined, {
@@ -26,6 +27,18 @@ export const fetchCameraById = createAsyncThunk<TCamerasCard, string, {
   'cameras/fetchCameraById',
   async (id, {extra: api}) => {
     const {data} = await api.get<TCamerasCard>(`${APIRoute.Cameras}/${id}`);
+    return data;
+  }
+);
+
+export const fetchReviewsById = createAsyncThunk<TReview[], string, {
+  dispatch: AppDispatch;
+  state: State;
+  extra: AxiosInstance;
+}>(
+  'cameras/fetchReviewsById',
+  async (id, {extra: api}) => {
+    const {data} = await api.get<TReview[]>(`${APIRoute.Cameras}/${id}/reviews`);
     return data;
   }
 );

@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useEffect, useState, MouseEvent } from 'react';
 // import { Helmet } from 'react-helmet-async';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { fetchCameraById } from '../../store/api-actions';
+import { fetchCameraById, fetchReviewsById } from '../../store/api-actions';
 import { selectCurrentProduct, selectCurrentProductLoadingStatus } from '../../store/slices/cameras';
 import StarRating from '../../components/star-rating/star-rating';
 import Loader from '../../components/loader/loader';
@@ -16,6 +16,7 @@ const ProductPage = (): JSX.Element => {
   useEffect(() => {
     if (id) {
       dispatch(fetchCameraById(id));
+      dispatch(fetchReviewsById(id));
     }
   }, [id, dispatch]);
 
