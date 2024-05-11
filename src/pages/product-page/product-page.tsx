@@ -47,6 +47,8 @@ const ProductPage = (): JSX.Element => {
     setVisibleReviewsCount((prevCount) => prevCount + 3);
   };
 
+  const allReviewsLoaded = reviewsData.length <= visibleReviewsCount;
+
   return (
     <main>
       <div className="page-content">
@@ -415,15 +417,16 @@ const ProductPage = (): JSX.Element => {
                 {/*<button class="btn" type="button">Оставить свой отзыв</button>*/}
               </div>
               <ReviewsList reviews={slicedReviewsData} />
+              {!allReviewsLoaded &&
               <div className="review-block__buttons">
                 <button
                   className="btn btn--purple"
                   type="button"
                   onClick={handleShowMoreReviews}
                 >
-                  Показать больше отзывов
+                Показать больше отзывов
                 </button>
-              </div>
+              </div>}
             </div>
           </section>
         </div>

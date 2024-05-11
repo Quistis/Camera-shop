@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+import 'dayjs/locale/ru';
 import StarRating from '../star-rating/star-rating';
 import { TReview } from '../../types/reviews';
 
@@ -9,13 +11,17 @@ const ReviewCard = ({reviewData}: ReviewCardProps): JSX.Element => {
 
   const {createAt, userName, advantage, disadvantage, review, rating} = reviewData;
 
+  dayjs.locale('ru');
+  const date = dayjs(createAt);
+  const formattedDate = date.format('DD MMMM');
+
   return (
     <li className="review-card">
 
       <div className="review-card__head">
         <p className="title title--h4">{userName}</p>
         <time className="review-card__data" dateTime="2022-04-13">
-          {createAt}
+          {formattedDate}
         </time>
       </div>
 
