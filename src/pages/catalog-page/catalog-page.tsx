@@ -1,16 +1,34 @@
+import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import { useAppSelector } from '../../hooks';
 import { selectCameraCards, selectCardsLoadingStatus } from '../../store/slices/cameras';
 import Banner from '../../components/banner/banner';
 import ProductsList from '../../components/products-list/products-list';
+import CallMeModal from '../../components/call-me-modal/call-me-modal';
 import Loader from '../../components/loader/loader';
+import { TCamerasCard } from '../../types/cameras';
+import { AppRoutes } from '../../const';
 
 const CatalogPage = (): JSX.Element => {
   const cardsData = useAppSelector(selectCameraCards);
   const isLoading = useAppSelector(selectCardsLoadingStatus);
+  const [activeProduct, setActiveProduct] = useState<TCamerasCard | null>(null);
+  const [isModalActive, setIsModalActive] = useState(false);
 
   if (isLoading) {
     return <Loader/>;
   }
+
+  const handleProductCardButtonClick = (product?: TCamerasCard) => {
+    if (product) {
+      setActiveProduct(product);
+      setIsModalActive(true);
+    }
+  };
+
+  const handleCrossButtonClick = () => {
+    setIsModalActive(false);
+  };
 
   return (
     <main>
@@ -20,12 +38,12 @@ const CatalogPage = (): JSX.Element => {
           <div className="container">
             <ul className="breadcrumbs__list">
               <li className="breadcrumbs__item">
-                <a className="breadcrumbs__link" href="index.html">
+                <Link className="breadcrumbs__link" to={AppRoutes.Main}>
                   Главная
                   <svg width={5} height={8} aria-hidden="true">
                     <use xlinkHref="#icon-arrow-mini" />
                   </svg>
-                </a>
+                </Link>
               </li>
               <li className="breadcrumbs__item">
                 <span className="breadcrumbs__link breadcrumbs__link--active">
@@ -154,7 +172,7 @@ const CatalogPage = (): JSX.Element => {
                     </div>
                   </form>
                 </div>*/}
-                <ProductsList cards={cardsData} />
+                <ProductsList cards={cardsData} onClick={handleProductCardButtonClick}/>
                 {/*<div class="pagination">
                   <ul class="pagination__list">
                     <li class="pagination__item"><a class="pagination__link pagination__link&#45;&#45;active" href="1">1</a>
@@ -172,6 +190,11 @@ const CatalogPage = (): JSX.Element => {
           </div>
         </section>
       </div>
+      <CallMeModal
+        product={activeProduct ? activeProduct : null}
+        isModalActive={isModalActive}
+        onCrossButtonClick={handleCrossButtonClick}
+      />
     </main>
   );
 };

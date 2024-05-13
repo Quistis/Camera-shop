@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import { useEffect, useState, MouseEvent } from 'react';
+import { useEffect, useState, useMemo, MouseEvent } from 'react';
 // import { Helmet } from 'react-helmet-async';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { fetchCameraById, fetchReviewsById } from '../../store/api-actions';
@@ -25,7 +25,12 @@ const ProductPage = (): JSX.Element => {
 
   const currentProduct = useAppSelector(selectCurrentProduct);
   const reviewsData = useAppSelector(selectReviewsData);
-  const slicedReviewsData = reviewsData.slice(0, visibleReviewsCount);
+
+  const sortedReviewsData = useMemo(() =>
+    reviewsData.slice().sort((a, b) => new Date(b.createAt).getTime() - new Date(a.createAt).getTime()),
+  [reviewsData]);
+
+  const slicedReviewsData = sortedReviewsData.slice(0, visibleReviewsCount);
   const isLoading = useAppSelector(selectCurrentProductLoadingStatus);
 
   if (isLoading) {

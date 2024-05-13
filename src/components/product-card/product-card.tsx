@@ -4,10 +4,17 @@ import { TCamerasCard } from '../../types/cameras';
 
 type ProductCardsProps = {
   card: TCamerasCard;
+  onClick?: (product?: TCamerasCard) => void | null;
 };
 
-const ProductCard = ({card}: ProductCardsProps): JSX.Element => {
+const ProductCard = ({card, onClick}: ProductCardsProps): JSX.Element => {
   const {id, name, category, price, rating, reviewCount, previewImg, previewImg2x, previewImgWebp, previewImgWebp2x} = card;
+
+  const handleProductCardButtonClick = () => {
+    if (onClick) {
+      onClick(card);
+    }
+  };
 
   return (
     <div className="product-card">
@@ -39,6 +46,7 @@ const ProductCard = ({card}: ProductCardsProps): JSX.Element => {
         <button
           className="btn btn--purple product-card__btn"
           type="button"
+          onClick={handleProductCardButtonClick}
         >
           Купить
         </button>
