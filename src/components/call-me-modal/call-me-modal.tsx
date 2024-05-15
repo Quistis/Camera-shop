@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, ChangeEvent } from 'react';
 import { TCamerasCard } from '../../types/cameras';
 import './call-me-modal.css';
 
@@ -11,8 +11,8 @@ type CallMeModalProps = {
 //TODO: Что-то сделать с валидацией номера и сабмитом данных, пока что закоментил неактивные участки кода
 
 const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallMeModalProps): JSX.Element => {
-  // const [phoneNumber, setPhoneNumber] = useState('');
-  // const [isValidPhoneNumber, setIsValidPhoneNumber] = useState(true);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [isValidPhoneNumber, setIsValidPhoneNumber] = useState(true);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -45,15 +45,15 @@ const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallM
 
   const {vendorCode, name, category, price, level, type, previewImgWebp, previewImgWebp2x, previewImg, previewImg2x} = product;
 
-  // const validatePhoneNumber = (input: string) => {
-  //   const pattern = /^(?:\+?7|8)?(?:\(\d{3}\)|\d{3})[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}$/;
-  //   setIsValidPhoneNumber(pattern.test(input));
-  // };
+  const validatePhoneNumber = (input: string) => {
+    const pattern = /^(?:\+?7|8)?(?:\(\d{3}\)|\d{3})[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}$/;
+    setIsValidPhoneNumber(pattern.test(input));
+  };
 
-  // const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-  //   setPhoneNumber(event.target.value);
-  //   validatePhoneNumber(event.target.value);
-  // };
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setPhoneNumber(event.target.value);
+    validatePhoneNumber(event.target.value);
+  };
 
   const handleCrossButtonClick = () => {
     if (onCrossButtonClick) {
@@ -123,7 +123,7 @@ const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallM
               </p>
             </div>
           </div>
-          <div className="custom-input form-review__item">
+          <div className={`custom-input form-review__item ${!isValidPhoneNumber && phoneNumber.length !== 0 ? 'is-invalid' : ''}`}>
             <label>
               <span className="custom-input__label">
                 Телефон
@@ -137,11 +137,11 @@ const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallM
                 name="user-tel"
                 placeholder="Введите ваш номер"
                 // pattern='^(?:\+?7|8)?(?:\(\d{3}\)|\d{3})[-\s]?\\d{3}[-\s]?\\d{2}[-\s]?\\d{2}$'
-                // onChange={handleInputChange}
+                onChange={handleInputChange}
                 required
               />
             </label>
-            {/* {!isValidPhoneNumber && <p className="custom-input__error">Нужно указать номер</p>} */}
+            {!isValidPhoneNumber && phoneNumber.length !== 0 && <p className="custom-input__error">Нужно указать номер</p>}
           </div>
           <div className="modal__buttons">
             <button
