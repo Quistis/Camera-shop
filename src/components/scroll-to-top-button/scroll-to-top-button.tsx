@@ -15,13 +15,15 @@ const ScrollToTopButton = () => {
       document.body.scrollIntoView(options);
     };
 
-    if (buttonRef.current) {
-      buttonRef.current.addEventListener('click', scrollToTop);
+    const currentButtonRef = buttonRef.current;
+
+    if (currentButtonRef) {
+      currentButtonRef.addEventListener('click', scrollToTop);
     }
 
     return () => {
-      if (buttonRef.current) {
-        buttonRef.current.removeEventListener('click', scrollToTop);
+      if (currentButtonRef) {
+        currentButtonRef.removeEventListener('click', scrollToTop);
       }
     };
   }, []);
