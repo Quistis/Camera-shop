@@ -5,6 +5,7 @@ import { ToastContainer } from 'react-toastify';
 import { store } from './store';
 import { fetchCameras } from './store/api-actions';
 import App from './components/app/app';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 store.dispatch(fetchCameras());

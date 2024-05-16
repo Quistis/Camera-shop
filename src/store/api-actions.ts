@@ -42,3 +42,16 @@ export const fetchReviewsById = createAsyncThunk<TReview[], string, {
     return data;
   }
 );
+
+export const postOrderPhoneNumber = createAsyncThunk<void, {tel: string}, {
+  dispatch: AppDispatch;
+  state: State;
+  extra: AxiosInstance;
+}>(
+  'orders/postOrderPhoneNumber',
+  async({tel}, {extra: api}) => {
+
+    await api.post<void>(APIRoute.Order, {tel});
+
+  }
+);
