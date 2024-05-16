@@ -1,4 +1,8 @@
-import { useEffect, useRef, useState, ChangeEvent } from 'react';
+import { useEffect, useRef } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { toast } from 'react-toastify';
+import { useAppDispatch } from '../../hooks';
+import { postOrderPhoneNumber } from '../../store/api-actions';
 import { TCamerasCard } from '../../types/cameras';
 import './call-me-modal.css';
 
@@ -8,11 +12,45 @@ type CallMeModalProps = {
   onCrossButtonClick?: () => void | null;
 };
 
-//TODO: Что-то сделать с валидацией номера и сабмитом данных, пока что закоментил неактивные участки кода
+type FormValues = {
+  phoneNumber: string;
+};
+
+const generateDescription = (cameraType: string, cameraCategory: string): string => {
+
+  const categoryEndings: Record<string, string> = {
+    Фотоаппарат: 'фотоаппарат',
+    Видеокамера: 'видеокамера',
+  };
+
+  const typeEnding = cameraCategory === 'Фотоаппарат' ? 'Цифровой' : cameraType;
+
+  const description = `${typeEnding.charAt(0).toUpperCase()}${typeEnding.slice(1).toLowerCase()} ${categoryEndings[cameraCategory].toLowerCase()}`;
+
+  return description;
+};
+
+const normalizePhoneNumber = (phoneNumber: string): string => {
+  // Удаление всех символов, кроме цифр
+  const digitsOnly: string = phoneNumber.replace(/\D/g, '');
+
+  // Проверка и изменение начала номера, если он начинается с "8"
+  const normalized: string = digitsOnly.startsWith('8') ? `7${digitsOnly.slice(1)}` : digitsOnly;
+
+  // Добавление кода страны
+  const countryCodeAdded: string = normalized.startsWith('7') ? normalized : `7${normalized}`;
+
+  // Проверка длины номера
+  if (countryCodeAdded.length !== 11) {
+    throw new Error('Неправильная длина номера телефона');
+  }
+
+  return `+${countryCodeAdded}`;
+};
 
 const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallMeModalProps): JSX.Element => {
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [isValidPhoneNumber, setIsValidPhoneNumber] = useState(true);
+  const dispatch = useAppDispatch();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<FormValues>();
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -29,6 +67,7 @@ const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallM
     const handleEscKeyDown = (evt: KeyboardEvent) => {
       if (evt.key === 'Escape' && isModalActive && onCrossButtonClick) {
         onCrossButtonClick();
+        reset({ phoneNumber: '' });
       }
     };
 
@@ -37,7 +76,7 @@ const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallM
     return () => {
       document.removeEventListener('keydown', handleEscKeyDown);
     };
-  }, [isModalActive, onCrossButtonClick]);
+  }, [isModalActive, onCrossButtonClick, reset]);
 
   if (!product) {
     return <div style={{display: 'none'}}></div>;
@@ -45,45 +84,30 @@ const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallM
 
   const {vendorCode, name, category, price, level, type, previewImgWebp, previewImgWebp2x, previewImg, previewImg2x} = product;
 
-  const validatePhoneNumber = (input: string) => {
-    const pattern = /^(?:\+?7|8)?(?:\(\d{3}\)|\d{3})[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}$/;
-    setIsValidPhoneNumber(pattern.test(input));
-  };
-
-  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setPhoneNumber(event.target.value);
-    validatePhoneNumber(event.target.value);
-  };
-
   const handleCrossButtonClick = () => {
     if (onCrossButtonClick) {
       onCrossButtonClick();
+      reset({ phoneNumber: '' });
     }
   };
 
-  // const handleSubmit = () => {
-  //   // Вы можете выполнить здесь дополнительные проверки перед отправкой данных
-  //   if (isValidPhoneNumber) {
-  //     // Отправка данных
-  //     console.log('Номер телефона:', phoneNumber);
-  //   } else {
-  //     // Показать ошибку пользователю или предпринять другие действия
-  //     console.log('Неверный номер телефона. Пожалуйста, исправьте его.');
-  //   }
-  // };
+  const onSubmit: SubmitHandler<FormValues> = (data) => {
+    // if (!data.phoneNumber.trim()) {
+    //   console.log(data.phoneNumber.trim());
+    //   return;
+    // }
 
-  const generateDescription = (cameraType: string, cameraCategory: string): string => {
-
-    const categoryEndings: Record<string, string> = {
-      Фотоаппарат: 'фотоаппарат',
-      Видеокамера: 'видеокамера',
-    };
-
-    const typeEnding = cameraCategory === 'Фотоаппарат' ? 'Цифровой' : cameraType;
-
-    const description = `${typeEnding.charAt(0).toUpperCase()}${typeEnding.slice(1).toLowerCase()} ${categoryEndings[cameraCategory].toLowerCase()}`;
-
-    return description;
+    dispatch(postOrderPhoneNumber({ tel: normalizePhoneNumber(data.phoneNumber) }))
+      .then((response) => {
+        if (response.meta.requestStatus === 'fulfilled') {
+          if (onCrossButtonClick) {
+            onCrossButtonClick();
+            reset({ phoneNumber: '' });
+          }
+        } else {
+          toast.warn('Ошибка при оформолении заказа');
+        }
+      });
   };
 
   return (
@@ -123,7 +147,7 @@ const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallM
               </p>
             </div>
           </div>
-          <div className={`custom-input form-review__item ${!isValidPhoneNumber && phoneNumber.length !== 0 ? 'is-invalid' : ''}`}>
+          <div className={`custom-input form-review__item ${errors.phoneNumber ? 'is-invalid' : ''}`}>
             <label>
               <span className="custom-input__label">
                 Телефон
@@ -132,22 +156,32 @@ const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallM
                 </svg>
               </span>
               <input
-                ref={inputRef}
+                {...register('phoneNumber', {
+                  required: 'Это поле обязательно',
+                  pattern: {
+                    // value: /^(?:\+?7|8)?(?:\(\d{3}\)|\d{3})[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}$/,
+                    // value: /^(?=(?:\+?7|8))\+?(?:7|8)\s?\(?(?:9\d{2})\)?[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}$/,
+                    // value: /^(?=(?:\+?7|8))\+?(?:7|8)\s?(?:\(\d{3}\)|\d{3})?[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}$/,
+                    // value: /^(?=([+]7|8))\+?(?:7|8)\s?(?:\(\d{3}\)|\d{3})?[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}$/,
+                    value: /^(?=([+]7|8))\+?(?:7|8)\s?(?:\(\d{3}\)|9\d{2})?[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}$/,
+                    message: 'Неверный формат номера'
+                  }
+                })}
                 type="tel"
-                name="user-tel"
+                name="phoneNumber"
                 placeholder="Введите ваш номер"
-                // pattern='^(?:\+?7|8)?(?:\(\d{3}\)|\d{3})[-\s]?\\d{3}[-\s]?\\d{2}[-\s]?\\d{2}$'
-                onChange={handleInputChange}
-                required
               />
             </label>
-            {!isValidPhoneNumber && phoneNumber.length !== 0 && <p className="custom-input__error">Нужно указать номер</p>}
+            {errors.phoneNumber && <p className="custom-input__error">{errors.phoneNumber.message}</p>}
           </div>
           <div className="modal__buttons">
             <button
               className="btn btn--purple modal__btn modal__btn--fit-width"
               type="button"
-              // onClick={handleSubmit}
+              onClick={(event) => {
+                event.preventDefault();
+                handleSubmit(onSubmit)(event);
+              }}
             >
               <svg width={24} height={16} aria-hidden="true">
                 <use xlinkHref="#icon-add-basket" />
