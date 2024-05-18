@@ -5,6 +5,7 @@ import { AppDispatch, State } from '../types/state';
 import { TCamerasCard } from '../types/cameras';
 import { TReview } from '../types/reviews';
 import { APIRoute } from '../const';
+import { TImagePreview } from '../types/banners';
 
 export const fetchCameras = createAsyncThunk<TCamerasCard[], undefined, {
   dispatch: AppDispatch;
@@ -51,6 +52,19 @@ export const fetchReviewsById = createAsyncThunk<TReview[], string, {
   'cameras/fetchReviewsById',
   async (id, {extra: api}) => {
     const {data} = await api.get<TReview[]>(`${APIRoute.Cameras}/${id}/reviews`);
+    return data;
+  }
+);
+
+export const fetchPromos = createAsyncThunk<TImagePreview[], undefined, {
+  dispatch: AppDispatch;
+  state: State;
+  extra: AxiosInstance;
+}>(
+  'promo/fetchPromos',
+  async (_arg, {extra: api}) => {
+    const {data} = await api.get<TImagePreview[]>(APIRoute.Promo);
+
     return data;
   }
 );

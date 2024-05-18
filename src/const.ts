@@ -6,10 +6,11 @@ export const AppRoutes = {
 export enum APIRoute {
   Cameras = '/cameras',
   Order = '/order',
-
+  Promo = '/promo',
 }
 
 export enum NameSpace {
   Cameras = 'CAMERAS',
   Reviews = 'REVIEWS',
+  Promos = 'PROMOS',
 }

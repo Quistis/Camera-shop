@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useAppSelector } from '../../hooks';
 import { selectCameraCards, selectCardsLoadingStatus } from '../../store/slices/cameras';
+import { selectPromosData, selectPromosLoadingStatus } from '../../store/slices/promos';
 import Banner from '../../components/banner/banner';
 import ProductsList from '../../components/products-list/products-list';
 import CallMeModal from '../../components/call-me-modal/call-me-modal';
@@ -11,11 +12,13 @@ import { AppRoutes } from '../../const';
 
 const CatalogPage = (): JSX.Element => {
   const cardsData = useAppSelector(selectCameraCards);
+  const promosData = useAppSelector(selectPromosData);
   const isLoading = useAppSelector(selectCardsLoadingStatus);
+  const isPromosLoading = useAppSelector(selectPromosLoadingStatus);
   const [activeProduct, setActiveProduct] = useState<TCamerasCard | null>(null);
   const [isModalActive, setIsModalActive] = useState(false);
 
-  if (isLoading) {
+  if (isLoading || isPromosLoading) {
     return <Loader/>;
   }
 
@@ -32,7 +35,7 @@ const CatalogPage = (): JSX.Element => {
 
   return (
     <main>
-      <Banner />
+      <Banner promo={promosData[0]}/>
       <div className="page-content">
         <div className="breadcrumbs">
           <div className="container">
