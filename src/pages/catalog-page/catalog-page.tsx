@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useAppSelector } from '../../hooks';
 import { selectCameraCards, selectCardsLoadingStatus } from '../../store/slices/cameras';
 import { selectPromosData, selectPromosLoadingStatus } from '../../store/slices/promos';
-import Banner from '../../components/banner/banner';
+import PromosSlider from '../../components/promos-slider/promos-slider';
 import ProductsList from '../../components/products-list/products-list';
 import CallMeModal from '../../components/call-me-modal/call-me-modal';
 import Loader from '../../components/loader/loader';
@@ -35,7 +35,7 @@ const CatalogPage = (): JSX.Element => {
 
   return (
     <main>
-      <Banner promo={promosData[0]}/>
+      <PromosSlider promos={promosData}/>
       <div className="page-content">
         <div className="breadcrumbs">
           <div className="container">
