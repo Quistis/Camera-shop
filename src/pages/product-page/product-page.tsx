@@ -56,6 +56,8 @@ const ProductPage = (): JSX.Element => {
   const similarProducts = useAppSelector(selectSimilarProducts);
   const reviewsData = useAppSelector(selectReviewsData);
 
+  const allReviewsLoaded = reviewsData.length <= visibleReviewsCount;
+
   const sortedReviewsData = useMemo(() =>
     reviewsData.slice().sort((a, b) => new Date(b.createAt).getTime() - new Date(a.createAt).getTime()),
   [reviewsData]);
@@ -76,8 +78,6 @@ const ProductPage = (): JSX.Element => {
     const buttonText = (evt.target as HTMLElement).textContent;
     setActiveTab(buttonText === 'Характеристики' ? 'specs' : 'description');
   };
-
-  const allReviewsLoaded = reviewsData.length <= visibleReviewsCount;
 
   return (
     <>
