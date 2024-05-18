@@ -31,6 +31,18 @@ export const fetchCameraById = createAsyncThunk<TCamerasCard, string, {
   }
 );
 
+export const fetchSimilarProductsById = createAsyncThunk<TCamerasCard[], string, {
+  dispatch: AppDispatch;
+  state: State;
+  extra: AxiosInstance;
+}>(
+  'cameras/fetchSimilarProductsById',
+  async (id, {extra: api}) => {
+    const {data} = await api.get<TCamerasCard[]>(`${APIRoute.Cameras}/${id}/similar`);
+    return data;
+  }
+);
+
 export const fetchReviewsById = createAsyncThunk<TReview[], string, {
   dispatch: AppDispatch;
   state: State;

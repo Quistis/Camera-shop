@@ -1,13 +1,16 @@
 import { Link } from 'react-router-dom';
 import StarRating from '../star-rating/star-rating';
 import { TCamerasCard } from '../../types/cameras';
+import './product-card.css';
 
 type ProductCardsProps = {
   card: TCamerasCard;
   onClick?: (product?: TCamerasCard) => void | null;
+  isActive?: boolean;
+  className?: string;
 };
 
-const ProductCard = ({card, onClick}: ProductCardsProps): JSX.Element => {
+const ProductCard = ({card, onClick, isActive, className}: ProductCardsProps): JSX.Element => {
   const {id, name, category, price, rating, reviewCount, previewImg, previewImg2x, previewImgWebp, previewImgWebp2x} = card;
 
   const handleProductCardButtonClick = () => {
@@ -17,16 +20,16 @@ const ProductCard = ({card, onClick}: ProductCardsProps): JSX.Element => {
   };
 
   return (
-    <div className="product-card">
+    <div className={`product-card ${className ? className : ''} ${isActive ? 'is-active' : ''}`}>
       <div className="product-card__img">
         <picture>
           <source
             type="image/webp"
-            srcSet={`${previewImgWebp}, ${previewImgWebp2x} 2x`}
+            srcSet={`/${previewImgWebp}, /${previewImgWebp2x} 2x`}
           />
           <img
-            src={`${previewImg}`}
-            srcSet={`${previewImg2x} 2x`}
+            src={`/${previewImg}`}
+            srcSet={`/${previewImg2x} 2x`}
             width={280}
             height={240}
             alt={name}
@@ -50,7 +53,7 @@ const ProductCard = ({card, onClick}: ProductCardsProps): JSX.Element => {
         >
           Купить
         </button>
-        <Link className="btn btn--transparent" to={`product/${id}`}>
+        <Link className="btn btn--transparent" to={`/product/${id}`}>
           Подробнее
         </Link>
       </div>

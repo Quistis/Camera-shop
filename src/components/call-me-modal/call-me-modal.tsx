@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { useAppDispatch } from '../../hooks';
@@ -50,14 +50,19 @@ const normalizePhoneNumber = (phoneNumber: string): string => {
 
 const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallMeModalProps): JSX.Element => {
   const dispatch = useAppDispatch();
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<FormValues>();
-
-  const inputRef = useRef<HTMLInputElement>(null);
+  const { register, handleSubmit, formState: { errors }, reset, setFocus } = useForm<FormValues>();
 
   useEffect(() => {
-    if (isModalActive && inputRef.current) {
+    if (isModalActive) {
+      setTimeout(() => {
+        setFocus('phoneNumber');
+      }, 100);
+    }
+  }, [setFocus, isModalActive]);
+
+  useEffect(() => {
+    if (isModalActive) {
       document.body.classList.add('modal-open');
-      inputRef.current.focus();
     } else {
       document.body.classList.remove('modal-open');
     }

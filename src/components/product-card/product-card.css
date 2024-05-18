@@ -1,0 +1,29 @@
+.product-card.showForward {
+  animation: fadeInForward 0.5s ease forwards;
+}
+
+.product-card.showBack {
+  animation: fadeInBack 0.5s ease forwards;
+}
+
+@keyframes fadeInForward {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInBack {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
