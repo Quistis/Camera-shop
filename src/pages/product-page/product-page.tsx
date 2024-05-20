@@ -8,8 +8,10 @@ import { selectReviewsData } from '../../store/slices/reviews';
 import StarRating from '../../components/star-rating/star-rating';
 import ProductsSlider from '../../components/products-slider/products-slider';
 import ReviewsList from '../../components/reviews-list/reviews-list';
+import CallMeModal from '../../components/call-me-modal/call-me-modal';
 import ScrollToTopButton from '../../components/scroll-to-top-button/scroll-to-top-button';
 import Loader from '../../components/loader/loader';
+import { TCamerasCard } from '../../types/cameras';
 import { AppRoutes } from '../../const';
 
 const ProductPage = (): JSX.Element => {
@@ -17,6 +19,8 @@ const ProductPage = (): JSX.Element => {
   const {id} = useParams();
   const [activeTab, setActiveTab] = useState('description');
   const [visibleReviewsCount, setVisibleReviewsCount] = useState(3);
+  const [activeProduct, setActiveProduct] = useState<TCamerasCard | null>(null);
+  const [isModalActive, setIsModalActive] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -77,6 +81,17 @@ const ProductPage = (): JSX.Element => {
   const handleTabsClick = (evt: MouseEvent<HTMLButtonElement>) => {
     const buttonText = (evt.target as HTMLElement).textContent;
     setActiveTab(buttonText === 'Характеристики' ? 'specs' : 'description');
+  };
+
+  const handleProductCardButtonClick = (product?: TCamerasCard) => {
+    if (product) {
+      setActiveProduct(product);
+      setIsModalActive(true);
+    }
+  };
+
+  const handleCrossButtonClick = () => {
+    setIsModalActive(false);
   };
 
   return (
@@ -202,7 +217,7 @@ const ProductPage = (): JSX.Element => {
             <section className="product-similar">
               <div className="container">
                 <h2 className="title title--h3">Похожие товары</h2>
-                <ProductsSlider products={similarProducts} itemsPerPage={3}/>
+                <ProductsSlider products={similarProducts} itemsPerPage={3} onClick={handleProductCardButtonClick}/>
               </div>
             </section>
           </div>}
@@ -231,6 +246,11 @@ const ProductPage = (): JSX.Element => {
         </div>
       </main>
       <ScrollToTopButton/>
+      <CallMeModal
+        product={activeProduct}
+        isModalActive={isModalActive}
+        onCrossButtonClick={handleCrossButtonClick}
+      />
     </>
   );
 };

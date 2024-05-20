@@ -5,9 +5,10 @@ import { TCamerasCard } from '../../types/cameras';
 type ProductSliderProps = {
   products: TCamerasCard[];
   itemsPerPage: number;
+  onClick?: (product?: TCamerasCard) => void | null;
 };
 
-const ProductsSlider = ({ products, itemsPerPage }: ProductSliderProps): JSX.Element => {
+const ProductsSlider = ({ products, itemsPerPage, onClick }: ProductSliderProps): JSX.Element => {
   const [startIndex, setStartIndex] = useState(0);
   const [isGoingBack, setIsGoingBack] = useState(false);
 
@@ -36,6 +37,7 @@ const ProductsSlider = ({ products, itemsPerPage }: ProductSliderProps): JSX.Ele
             card={product}
             isActive
             className={isGoingBack ? 'showBack' : 'showForward'}
+            onClick={onClick}
           />
         ))}
       </div>

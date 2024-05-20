@@ -31,7 +31,7 @@ const Banner = ({promo}: BannerProps): JSX.Element => {
         <span className="banner__text">
           Профессиональная камера от&nbsp;известного производителя
         </span>
-        <Link className="btn" to={`/product/${id}`}>
+        <Link className="btn" to={`/camera/${id}`}>
           Подробнее
         </Link>
       </p>

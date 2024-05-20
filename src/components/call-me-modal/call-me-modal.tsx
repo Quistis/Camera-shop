@@ -126,11 +126,11 @@ const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallM
               <picture>
                 <source
                   type="image/webp"
-                  srcSet={`${previewImgWebp}, ${previewImgWebp2x} 2x`}
+                  srcSet={`/${previewImgWebp}, /${previewImgWebp2x} 2x`}
                 />
                 <img
-                  src={`${previewImg}`}
-                  srcSet={`${previewImg2x} 2x`}
+                  src={`/${previewImg}`}
+                  srcSet={`/${previewImg2x} 2x`}
                   width={140}
                   height={120}
                   alt={`${category} ${name}`}

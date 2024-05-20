@@ -1,6 +1,6 @@
 export const AppRoutes = {
   Main: '/',
-  Product: '/product/:id',
+  Product: '/camera/:id',
 } as const;
 
 export enum APIRoute {

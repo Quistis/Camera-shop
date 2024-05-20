@@ -53,7 +53,7 @@ const ProductCard = ({card, onClick, isActive, className}: ProductCardsProps): J
         >
           Купить
         </button>
-        <Link className="btn btn--transparent" to={`/product/${id}`}>
+        <Link className="btn btn--transparent" to={`/camera/${id}`}>
           Подробнее
         </Link>
       </div>

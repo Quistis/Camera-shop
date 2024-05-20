@@ -12,7 +12,7 @@ type StarRatingProps = {
 const StarRating = ({rating, maxRating = MAX_RATING, reviewCount, isCommentSection = false}: StarRatingProps): JSX.Element => {
   const location = useLocation();
   const {id} = useParams();
-  const isProductPage = location.pathname === `/product/${id ? id : ''}`;
+  const isProductPage = location.pathname === `/camera/${id ? id : ''}`;
 
   return (
     <div className={isProductPage ? 'rate product__rate' : 'rate product-card__rate'}>
