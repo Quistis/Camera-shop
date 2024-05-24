@@ -7,6 +7,12 @@ import { TReview } from '../types/reviews';
 import { APIRoute } from '../const';
 import { TImagePreview } from '../types/banners';
 
+type TOrder = {
+  camerasIds: number[];
+  tel: string;
+  coupon: string | null;
+};
+
 export const fetchCameras = createAsyncThunk<TCamerasCard[], undefined, {
   dispatch: AppDispatch;
   state: State;
@@ -69,15 +75,15 @@ export const fetchPromos = createAsyncThunk<TImagePreview[], undefined, {
   }
 );
 
-export const postOrderPhoneNumber = createAsyncThunk<void, {tel: string}, {
+export const postOrder = createAsyncThunk<void, TOrder, {
   dispatch: AppDispatch;
   state: State;
   extra: AxiosInstance;
 }>(
-  'orders/postOrderPhoneNumber',
-  async({tel}, {extra: api}) => {
+  'orders/postOrder',
+  async({tel, camerasIds, coupon}, {extra: api}) => {
 
-    await api.post<void>(APIRoute.Order, {tel});
+    await api.post<void>(APIRoute.Order, {tel, camerasIds, coupon});
 
   }
 );

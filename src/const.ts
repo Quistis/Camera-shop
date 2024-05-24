@@ -5,7 +5,7 @@ export const AppRoutes = {
 
 export enum APIRoute {
   Cameras = '/cameras',
-  Order = '/order',
+  Order = '/orders',
   Promo = '/promo',
 }
 
