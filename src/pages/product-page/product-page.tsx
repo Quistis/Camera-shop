@@ -8,6 +8,7 @@ import { selectReviewsData } from '../../store/slices/reviews';
 import StarRating from '../../components/star-rating/star-rating';
 import ProductsSlider from '../../components/products-slider/products-slider';
 import ReviewsList from '../../components/reviews-list/reviews-list';
+import NotFoundPage from '../not-found-page/not-found-page';
 import CallMeModal from '../../components/call-me-modal/call-me-modal';
 import ScrollToTopButton from '../../components/scroll-to-top-button/scroll-to-top-button';
 import Loader from '../../components/loader/loader';
@@ -73,7 +74,7 @@ const ProductPage = (): JSX.Element => {
   }
 
   if (!currentProduct) {
-    return <div> Тут будет страница с ошибкой, потом:D </div>;
+    return <NotFoundPage/>;
   }
 
   const {name, category, type, level, vendorCode, price, description, rating, reviewCount, previewImg, previewImg2x, previewImgWebp, previewImgWebp2x} = currentProduct;

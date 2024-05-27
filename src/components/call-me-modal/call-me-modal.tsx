@@ -1,11 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import FocusTrap from 'focus-trap-react';
 import { toast } from 'react-toastify';
 import { useAppDispatch } from '../../hooks';
 import { postOrder } from '../../store/api-actions';
 import { TCamerasCard } from '../../types/cameras';
-import './call-me-modal.css';
 
 type CallMeModalProps = {
   product: TCamerasCard | null;
@@ -49,25 +48,37 @@ const normalizePhoneNumber = (phoneNumber: string): string => {
   return `+${countryCodeAdded}`;
 };
 
-const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallMeModalProps): JSX.Element | null => {
+const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallMeModalProps): JSX.Element => {
   const dispatch = useAppDispatch();
   const { register, handleSubmit, formState: { errors }, reset, setFocus } = useForm<FormValues>();
+  const [isFocusTrapActive, setIsFocusTrapActive] = useState(false);
 
   useEffect(() => {
     if (isModalActive) {
       setTimeout(() => {
         setFocus('phoneNumber');
+        setIsFocusTrapActive(true);
       }, 100);
+    } else {
+      setIsFocusTrapActive(false);
     }
   }, [setFocus, isModalActive]);
 
   useEffect(() => {
     if (isModalActive) {
-      document.body.classList.add('modal-open');
+      document.body.classList.add('scroll-lock');
     } else {
-      document.body.classList.remove('modal-open');
+      document.body.classList.remove('scroll-lock');
     }
   }, [isModalActive]);
+
+  // useEffect(() => {
+  //   if (isModalActive) {
+  //     setTimeout(() => {
+  //       setFocus('phoneNumber');
+  //     }, 100);
+  //   }
+  // }, [setFocus, isModalActive]);
 
   useEffect(() => {
     const handleEscKeyDown = (evt: KeyboardEvent) => {
@@ -124,11 +135,12 @@ const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallM
   //   };
   // }, [isModalActive]);
 
-  if (!product || !isModalActive) {
-    return null;
-  }
+  // if (!product) {
+  //   return null;
+  // }
 
-  const {vendorCode, name, category, price, level, type, previewImgWebp, previewImgWebp2x, previewImg, previewImg2x} = product;
+  // const {vendorCode, name, category, price, level, type, previewImgWebp, previewImgWebp2x, previewImg, previewImg2x} = product ?? {};
+  const { vendorCode = '', name = '', category = '', price = 0, level = '', type = '', previewImgWebp = '', previewImgWebp2x = '', previewImg = '', previewImg2x = '' } = product ?? {};
 
   const handleCrossButtonClick = () => {
     if (onCrossButtonClick) {
@@ -142,31 +154,34 @@ const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallM
     //   console.log(data.phoneNumber.trim());
     //   return;
     // }
-
-    dispatch(postOrder({
-      tel: normalizePhoneNumber(data.phoneNumber),
-      camerasIds: [product.id],
-      coupon: null,
-    }))
-      .then((response) => {
-        if (response.meta.requestStatus === 'fulfilled') {
-          if (onCrossButtonClick) {
-            onCrossButtonClick();
-            reset({ phoneNumber: '' });
+    if (product) {
+      dispatch(postOrder({
+        tel: normalizePhoneNumber(data.phoneNumber),
+        camerasIds: [product.id],
+        coupon: null,
+      }))
+        .then((response) => {
+          if (response.meta.requestStatus === 'fulfilled') {
+            if (onCrossButtonClick) {
+              onCrossButtonClick();
+              reset({ phoneNumber: '' });
+              toast.success('Успешно отправлено');
+            }
+          } else {
+            toast.warn('Ошибка при оформолении заказа');
           }
-        } else {
-          toast.warn('Ошибка при оформолении заказа');
-        }
-      });
+        });
+    }
   };
 
   return (
-    <FocusTrap active={isModalActive}>
+    <FocusTrap active={isFocusTrapActive}>
       <div className={`modal ${isModalActive ? 'is-active' : ''}`}>
         <div className="modal__wrapper">
           <div className="modal__overlay" onClick={handleCrossButtonClick}/>
           <div className="modal__content">
             <p className="title title--h4">Свяжитесь со мной</p>
+            {product &&
             <div className="basket-item basket-item--short">
               <div className="basket-item__img">
                 <picture>
@@ -197,7 +212,7 @@ const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallM
                   <span className="visually-hidden">Цена:</span>{price.toLocaleString('ru-RU')} ₽
                 </p>
               </div>
-            </div>
+            </div>}
             <div className={`custom-input form-review__item ${errors.phoneNumber ? 'is-invalid' : ''}`}>
               <label>
                 <span className="custom-input__label">
