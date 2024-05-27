@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { TCamerasCard } from '../../types/cameras';
 import { State } from '../../types/state';
-import { fetchCameras, fetchCameraById } from '../api-actions';
+import { fetchCameras, fetchCameraById, fetchSimilarProductsById } from '../api-actions';
 import { NameSpace } from '../../const';
 
 type CamerasSliceType = {
@@ -15,6 +15,11 @@ type CamerasSliceType = {
     loadingStatus: boolean;
     errorStatus: boolean;
   };
+  similarProducts: {
+    data: TCamerasCard[] | null;
+    loadingStatus: boolean;
+    errorStatus: boolean;
+  };
 };
 
 const initialState: CamerasSliceType = {
@@ -24,6 +29,11 @@ const initialState: CamerasSliceType = {
     errorStatus: false,
   },
   currentProduct: {
+    data: null,
+    loadingStatus: false,
+    errorStatus: false,
+  },
+  similarProducts: {
     data: null,
     loadingStatus: false,
     errorStatus: false,
@@ -60,15 +70,29 @@ export const CamerasSlice = createSlice({
       .addCase(fetchCameraById.rejected, (state) => {
         state.currentProduct.loadingStatus = false;
         state.currentProduct.errorStatus = true;
+      })
+
+      .addCase(fetchSimilarProductsById.pending, (state) => {
+        state.similarProducts.errorStatus = false;
+        state.similarProducts.loadingStatus = true;
+      })
+      .addCase(fetchSimilarProductsById.fulfilled, (state, action) => {
+        state.similarProducts.data = action.payload;
+        state.similarProducts.loadingStatus = false;
+      })
+      .addCase(fetchSimilarProductsById.rejected, (state) => {
+        state.similarProducts.loadingStatus = false;
+        state.similarProducts.errorStatus = true;
       });
   }
 });
 
 export const selectCameraCards = (state: State): TCamerasCard[] => state[NameSpace.Cameras].cards.cardsData;
 export const selectCurrentProduct = (state: State): TCamerasCard | null => state[NameSpace.Cameras].currentProduct.data;
+export const selectSimilarProducts = (state: State): TCamerasCard[] | null => state[NameSpace.Cameras].similarProducts.data;
 
 export const selectCardsLoadingStatus = (state: State): boolean => state[NameSpace.Cameras].cards.loadingStatus;
 export const selectCurrentProductLoadingStatus = (state: State): boolean => state[NameSpace.Cameras].currentProduct.loadingStatus;
-
+export const selectSimilarProductsLoadingStatus = (state: State): boolean => state[NameSpace.Cameras].similarProducts.loadingStatus;
 
 export const camerasReducer = CamerasSlice.reducer;

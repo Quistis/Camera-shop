@@ -1,0 +1,31 @@
+.swiper-pagination {
+  position: absolute;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.swiper-pagination-bullets, .swiper-pagination-bullets.swiper-pagination-horizontal {
+  left: -40px;
+  bottom: 22px;
+}
+
+.swiper-pagination-bullet {
+  background-color: #f4f4fc;
+  width: 16px;
+  height: 16px;
+  opacity: 1;
+}
+
+.swiper-pagination-bullet:hover {
+  background-color: #e8e8fa;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #7575e2;
+  opacity: 1;
+}
+
+.swiper-pagination-bullet-active:hover {
+  background-color: #a2a2ff;
+}

@@ -5,6 +5,13 @@ import { AppDispatch, State } from '../types/state';
 import { TCamerasCard } from '../types/cameras';
 import { TReview } from '../types/reviews';
 import { APIRoute } from '../const';
+import { TImagePreview } from '../types/banners';
+
+type TOrder = {
+  camerasIds: number[];
+  tel: string;
+  coupon: string | null;
+};
 
 export const fetchCameras = createAsyncThunk<TCamerasCard[], undefined, {
   dispatch: AppDispatch;
@@ -31,6 +38,18 @@ export const fetchCameraById = createAsyncThunk<TCamerasCard, string, {
   }
 );
 
+export const fetchSimilarProductsById = createAsyncThunk<TCamerasCard[], string, {
+  dispatch: AppDispatch;
+  state: State;
+  extra: AxiosInstance;
+}>(
+  'cameras/fetchSimilarProductsById',
+  async (id, {extra: api}) => {
+    const {data} = await api.get<TCamerasCard[]>(`${APIRoute.Cameras}/${id}/similar`);
+    return data;
+  }
+);
+
 export const fetchReviewsById = createAsyncThunk<TReview[], string, {
   dispatch: AppDispatch;
   state: State;
@@ -43,15 +62,28 @@ export const fetchReviewsById = createAsyncThunk<TReview[], string, {
   }
 );
 
-export const postOrderPhoneNumber = createAsyncThunk<void, {tel: string}, {
+export const fetchPromos = createAsyncThunk<TImagePreview[], undefined, {
   dispatch: AppDispatch;
   state: State;
   extra: AxiosInstance;
 }>(
-  'orders/postOrderPhoneNumber',
-  async({tel}, {extra: api}) => {
+  'promo/fetchPromos',
+  async (_arg, {extra: api}) => {
+    const {data} = await api.get<TImagePreview[]>(APIRoute.Promo);
 
-    await api.post<void>(APIRoute.Order, {tel});
+    return data;
+  }
+);
+
+export const postOrder = createAsyncThunk<void, TOrder, {
+  dispatch: AppDispatch;
+  state: State;
+  extra: AxiosInstance;
+}>(
+  'orders/postOrder',
+  async({tel, camerasIds, coupon}, {extra: api}) => {
+
+    await api.post<void>(APIRoute.Order, {tel, camerasIds, coupon});
 
   }
 );

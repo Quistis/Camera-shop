@@ -3,6 +3,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import Layout from '../layout/layout';
 import CatalogPage from '../../pages/catalog-page/catalog-page';
 import ProductPage from '../../pages/product-page/product-page';
+import NotFoundPage from '../../pages/not-found-page/not-found-page';
 import { AppRoutes } from '../../const';
 
 const App = (): JSX.Element => (
@@ -17,6 +18,10 @@ const App = (): JSX.Element => (
           <Route
             path={AppRoutes.Product}
             element={<ProductPage />}
+          />
+          <Route
+            path='*'
+            element={<NotFoundPage />}
           />
         </Route>
       </Routes>

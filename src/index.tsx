@@ -3,12 +3,13 @@ import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
 import { store } from './store';
-import { fetchCameras } from './store/api-actions';
+import { fetchCameras, fetchPromos } from './store/api-actions';
 import App from './components/app/app';
 import 'react-toastify/dist/ReactToastify.css';
 
 
 store.dispatch(fetchCameras());
+store.dispatch(fetchPromos());
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

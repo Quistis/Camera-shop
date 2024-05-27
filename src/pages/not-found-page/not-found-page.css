@@ -1,0 +1,23 @@
+.error-screen {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-screen--title {
+  font-size: 60px;
+  color: #7575e2;
+  padding: 0;
+  margin-bottom: 35px;
+}
+
+.error-screen--back {
+  font-size: 25px;
+  text-decoration: underline;
+}
+
+.error-screen--back:hover {
+  color: #a2a2ff;
+}

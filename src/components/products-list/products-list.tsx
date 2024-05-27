@@ -1,5 +1,6 @@
 import ProductCard from '../product-card/product-card';
 import { TCamerasCard } from '../../types/cameras';
+import './products-list.css';
 
 type ProductsListProps = {
   cards: TCamerasCard[];
@@ -8,7 +9,7 @@ type ProductsListProps = {
 
 const ProductsList = ({cards, onClick}: ProductsListProps): JSX.Element => (
   <div className="cards catalog__cards">
-    {cards.map((card) => <ProductCard key={card.id} card={card} onClick={onClick}/>)}
+    {cards.map((card) => <ProductCard key={card.id} card={card} onClick={onClick} isActive={false}/>)}
   </div>
 );
 
