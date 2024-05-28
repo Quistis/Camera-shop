@@ -1,6 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AxiosInstance } from 'axios';
-// import {saveToken, dropToken} from '../services/token';
 import { AppDispatch, State } from '../types/state';
 import { TCamerasCard } from '../types/cameras';
 import { TReview } from '../types/reviews';

@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { useEffect, useState, useMemo, MouseEvent } from 'react';
-// import { Helmet } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { fetchCameraById, fetchReviewsById, fetchSimilarProductsById } from '../../store/api-actions';
 import { selectCurrentProduct, selectCurrentProductLoadingStatus, selectSimilarProducts } from '../../store/slices/cameras';
@@ -98,6 +98,11 @@ const ProductPage = (): JSX.Element => {
   return (
     <>
       <main>
+        <Helmet>
+          <title>
+            Camera Shop. {currentProduct.name}
+          </title>
+        </Helmet>
         <div className="page-content">
           <div className="breadcrumbs">
             <div className="container">
@@ -228,7 +233,6 @@ const ProductPage = (): JSX.Element => {
               <div className="container">
                 <div className="page-content__headed">
                   <h2 className="title title--h3">Отзывы</h2>
-                  {/*<button class="btn" type="button">Оставить свой отзыв</button>*/}
                 </div>
                 <ReviewsList reviews={slicedReviewsData} />
                 {!allReviewsLoaded &&
