@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import StarRating from '../star-rating/star-rating';
 import { TCamerasCard } from '../../types/cameras';
@@ -10,7 +11,7 @@ type ProductCardsProps = {
   className?: string;
 };
 
-const ProductCard = ({card, onClick, isActive, className}: ProductCardsProps): JSX.Element => {
+const ProductCard = memo(({card, onClick, isActive, className}: ProductCardsProps): JSX.Element => {
   const {id, name, category, price, rating, reviewCount, previewImg, previewImg2x, previewImgWebp, previewImgWebp2x} = card;
 
   const handleProductCardButtonClick = () => {
@@ -59,6 +60,8 @@ const ProductCard = ({card, onClick, isActive, className}: ProductCardsProps): J
       </div>
     </div>
   );
-};
+});
+
+ProductCard.displayName = 'ProductCard';
 
 export default ProductCard;

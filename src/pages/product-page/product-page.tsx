@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import { useEffect, useState, useMemo, MouseEvent } from 'react';
+import { useEffect, useState, useMemo, useCallback, MouseEvent } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { fetchCameraById, fetchReviewsById, fetchSimilarProductsById } from '../../store/api-actions';
@@ -23,51 +23,49 @@ const ProductPage = (): JSX.Element => {
   const [activeProduct, setActiveProduct] = useState<TCamerasCard | null>(null);
   const [isModalActive, setIsModalActive] = useState(false);
 
+  const currentProduct = useAppSelector(selectCurrentProduct);
+  const similarProducts = useAppSelector(selectSimilarProducts);
+  const isLoading = useAppSelector(selectCurrentProductLoadingStatus);
+  const reviewsData = useAppSelector(selectReviewsData);
+
+  const sortedReviewsData = useMemo(() =>
+    reviewsData.slice().sort((a, b) => new Date(b.createAt).getTime() - new Date(a.createAt).getTime()),
+  [reviewsData]);
+  const slicedReviewsData = sortedReviewsData.slice(0, visibleReviewsCount);
+  const allReviewsLoaded = reviewsData.length <= visibleReviewsCount;
+
   useEffect(() => {
     if (id) {
       dispatch(fetchCameraById(id));
       dispatch(fetchReviewsById(id));
       dispatch(fetchSimilarProductsById(id));
+      setVisibleReviewsCount(3);
     }
   }, [id, dispatch]);
 
-  const isLoading = useAppSelector(selectCurrentProductLoadingStatus);
-
-  const handleShowMoreReviews = () => {
+  const handleShowMoreReviewsButtonClick = useCallback(() => {
     setVisibleReviewsCount((prevCount) => prevCount + 3);
-  };
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    if (!isLoading) {
+      const windowHeight = 'innerHeight' in window ? window.innerHeight : document.documentElement.offsetHeight;
+      const body = document.body;
+      const html = document.documentElement;
+      const docHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+      const windowBottom = windowHeight + window.scrollY;
+      if (windowBottom >= docHeight) {
+        handleShowMoreReviewsButtonClick();
+      }
+    }
+  }, [isLoading, handleShowMoreReviewsButtonClick]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (!isLoading) {
-        const windowHeight = 'innerHeight' in window ? window.innerHeight : document.documentElement.offsetHeight;
-        const body = document.body;
-        const html = document.documentElement;
-        const docHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
-        const windowBottom = windowHeight + window.scrollY;
-        if (windowBottom >= docHeight) {
-          handleShowMoreReviews();
-        }
-      }
-    };
-
     window.addEventListener('scroll', handleScroll);
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [isLoading]);
-
-  const currentProduct = useAppSelector(selectCurrentProduct);
-  const similarProducts = useAppSelector(selectSimilarProducts);
-  const reviewsData = useAppSelector(selectReviewsData);
-
-  const allReviewsLoaded = reviewsData.length <= visibleReviewsCount;
-
-  const sortedReviewsData = useMemo(() =>
-    reviewsData.slice().sort((a, b) => new Date(b.createAt).getTime() - new Date(a.createAt).getTime()),
-  [reviewsData]);
-
-  const slicedReviewsData = sortedReviewsData.slice(0, visibleReviewsCount);
+  }, [isLoading, handleScroll]);
 
   if (isLoading) {
     return <Loader/>;
@@ -84,7 +82,7 @@ const ProductPage = (): JSX.Element => {
     setActiveTab(buttonText === 'Характеристики' ? 'specs' : 'description');
   };
 
-  const handleProductCardButtonClick = (product?: TCamerasCard) => {
+  const handleProductCardBuyButtonClick = (product?: TCamerasCard) => {
     if (product) {
       setActiveProduct(product);
       setIsModalActive(true);
@@ -223,11 +221,12 @@ const ProductPage = (): JSX.Element => {
             <section className="product-similar">
               <div className="container">
                 <h2 className="title title--h3">Похожие товары</h2>
-                <ProductsSlider products={similarProducts} itemsPerPage={3} onClick={handleProductCardButtonClick}/>
+                <ProductsSlider products={similarProducts} itemsPerPage={3} onClick={handleProductCardBuyButtonClick}/>
               </div>
             </section>
           </div>}
 
+          {reviewsData.length !== 0 &&
           <div className="page-content__section">
             <section className="review-block" >
               <div className="container">
@@ -240,14 +239,15 @@ const ProductPage = (): JSX.Element => {
                   <button
                     className="btn btn--purple"
                     type="button"
-                    onClick={handleShowMoreReviews}
+                    onClick={handleShowMoreReviewsButtonClick}
                   >
                   Показать больше отзывов
                   </button>
                 </div>}
               </div>
             </section>
-          </div>
+          </div>}
+
         </div>
       </main>
       <ScrollToTopButton/>

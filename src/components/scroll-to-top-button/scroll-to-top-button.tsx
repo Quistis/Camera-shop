@@ -1,32 +1,32 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback, memo } from 'react';
 
-const ScrollToTopButton = () => {
+const ScrollToTopButton = memo(() => {
   const buttonRef = useRef<HTMLAnchorElement>(null);
 
-  useEffect(() => {
-    const scrollToTop = (event: MouseEvent) => {
-      event.preventDefault();
+  const handleScrollToTopButtonClick = useCallback((event: MouseEvent) => {
+    event.preventDefault();
 
-      const options: ScrollIntoViewOptions = {
-        behavior: 'smooth',
-        block: 'start'
-      };
-
-      document.body.scrollIntoView(options);
+    const options: ScrollIntoViewOptions = {
+      behavior: 'smooth',
+      block: 'start'
     };
 
+    document.body.scrollIntoView(options);
+  }, []);
+
+  useEffect(() => {
     const currentButtonRef = buttonRef.current;
 
     if (currentButtonRef) {
-      currentButtonRef.addEventListener('click', scrollToTop);
+      currentButtonRef.addEventListener('click', handleScrollToTopButtonClick);
     }
 
     return () => {
       if (currentButtonRef) {
-        currentButtonRef.removeEventListener('click', scrollToTop);
+        currentButtonRef.removeEventListener('click', handleScrollToTopButtonClick);
       }
     };
-  }, []);
+  }, [handleScrollToTopButtonClick]);
 
   return (
     <a
@@ -39,6 +39,8 @@ const ScrollToTopButton = () => {
       </svg>
     </a>
   );
-};
+});
+
+ScrollToTopButton.displayName = 'ScrollToTopButton';
 
 export default ScrollToTopButton;

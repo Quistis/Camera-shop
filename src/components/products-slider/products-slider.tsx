@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, memo } from 'react';
 import ProductCard from '../product-card/product-card';
 import { TCamerasCard } from '../../types/cameras';
 
@@ -8,25 +8,25 @@ type ProductSliderProps = {
   onClick?: (product?: TCamerasCard) => void | null;
 };
 
-const ProductsSlider = ({ products, itemsPerPage, onClick }: ProductSliderProps): JSX.Element => {
+const ProductsSlider = memo(({ products, itemsPerPage, onClick }: ProductSliderProps): JSX.Element | null => {
   const [startIndex, setStartIndex] = useState(0);
   const [isGoingBack, setIsGoingBack] = useState(false);
 
   const endIndex = startIndex + itemsPerPage;
 
-  const handlePrev = () => {
+  const handlePrevButtonClick = useCallback(() => {
     if (startIndex > 0) {
       setStartIndex((prevIndex) => prevIndex - itemsPerPage);
       setIsGoingBack(true);
     }
-  };
+  }, [startIndex, itemsPerPage]);
 
-  const handleNext = () => {
+  const handleNextButtonClick = useCallback(() => {
     if (endIndex < products.length) {
       setStartIndex((prevIndex) => prevIndex + itemsPerPage);
       setIsGoingBack(false);
     }
-  };
+  }, [endIndex, itemsPerPage, products.length]);
 
   return (
     <div className="product-similar__slider">
@@ -45,7 +45,7 @@ const ProductsSlider = ({ products, itemsPerPage, onClick }: ProductSliderProps)
         className="slider-controls slider-controls--prev"
         type="button"
         aria-label="Предыдущий слайд"
-        onClick={handlePrev}
+        onClick={handlePrevButtonClick}
         disabled={startIndex === 0}
       >
         <svg width={7} height={12} aria-hidden="true">
@@ -56,7 +56,7 @@ const ProductsSlider = ({ products, itemsPerPage, onClick }: ProductSliderProps)
         className="slider-controls slider-controls--next"
         type="button"
         aria-label="Следующий слайд"
-        onClick={handleNext}
+        onClick={handleNextButtonClick}
         disabled={endIndex >= products.length}
       >
         <svg width={7} height={12} aria-hidden="true">
@@ -65,6 +65,8 @@ const ProductsSlider = ({ products, itemsPerPage, onClick }: ProductSliderProps)
       </button>
     </div>
   );
-};
+});
+
+ProductsSlider.displayName = 'ProductsSlider';
 
 export default ProductsSlider;

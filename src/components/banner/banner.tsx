@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { TImagePreview } from '../../types/banners';
 
@@ -5,7 +6,7 @@ type BannerProps = {
   promo: TImagePreview;
 };
 
-const Banner = ({promo}: BannerProps): JSX.Element => {
+const Banner = memo(({promo}: BannerProps): JSX.Element => {
   const {id, name, previewImg, previewImg2x, previewImgWebp, previewImgWebp2x} = promo;
 
   return (
@@ -37,6 +38,8 @@ const Banner = ({promo}: BannerProps): JSX.Element => {
       </p>
     </div>
   );
-};
+});
+
+Banner.displayName = 'Banner';
 
 export default Banner;

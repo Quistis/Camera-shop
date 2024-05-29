@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 import StarRating from '../star-rating/star-rating';
@@ -7,7 +8,7 @@ type ReviewCardProps = {
   reviewData: TReview;
 };
 
-const ReviewCard = ({reviewData}: ReviewCardProps): JSX.Element => {
+const ReviewCard = memo(({reviewData}: ReviewCardProps): JSX.Element => {
 
   const {createAt, userName, advantage, disadvantage, review, rating} = reviewData;
 
@@ -54,6 +55,8 @@ const ReviewCard = ({reviewData}: ReviewCardProps): JSX.Element => {
 
     </li>
   );
-};
+});
+
+ReviewCard.displayName = 'ReviewCard';
 
 export default ReviewCard;

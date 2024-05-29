@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, memo } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import FocusTrap from 'focus-trap-react';
 import { toast } from 'react-toastify';
@@ -45,10 +45,12 @@ const normalizePhoneNumber = (phoneNumber: string): string => {
   return `+${countryCodeAdded}`;
 };
 
-const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallMeModalProps): JSX.Element => {
+const CallMeModal = memo(({product, isModalActive = false, onCrossButtonClick}: CallMeModalProps): JSX.Element => {
   const dispatch = useAppDispatch();
   const { register, handleSubmit, formState: { errors }, reset, setFocus } = useForm<FormValues>();
   const [isFocusTrapActive, setIsFocusTrapActive] = useState(false);
+
+  const { vendorCode = '', name = '', category = '', price = 0, level = '', type = '', previewImgWebp = '', previewImgWebp2x = '', previewImg = '', previewImg2x = '' } = product ?? {};
 
   useEffect(() => {
     if (isModalActive) {
@@ -69,31 +71,29 @@ const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallM
     }
   }, [isModalActive]);
 
-  useEffect(() => {
-    const handleEscKeyDown = (evt: KeyboardEvent) => {
-      if (evt.key === 'Escape' && isModalActive && onCrossButtonClick) {
-        onCrossButtonClick();
-        reset({ phoneNumber: '' });
-      }
-    };
+  const handleEscKeyDown = useCallback((evt: KeyboardEvent) => {
+    if (evt.key === 'Escape' && isModalActive && onCrossButtonClick) {
+      onCrossButtonClick();
+      reset({ phoneNumber: '' });
+    }
+  }, [isModalActive, reset, onCrossButtonClick]);
 
+  useEffect(() => {
     document.addEventListener('keydown', handleEscKeyDown);
 
     return () => {
       document.removeEventListener('keydown', handleEscKeyDown);
     };
-  }, [isModalActive, onCrossButtonClick, reset]);
+  }, [isModalActive, onCrossButtonClick, reset, handleEscKeyDown]);
 
-  const { vendorCode = '', name = '', category = '', price = 0, level = '', type = '', previewImgWebp = '', previewImgWebp2x = '', previewImg = '', previewImg2x = '' } = product ?? {};
-
-  const handleCrossButtonClick = () => {
+  const handleCrossButtonClick = useCallback(() => {
     if (onCrossButtonClick) {
       onCrossButtonClick();
       reset({ phoneNumber: '' });
     }
-  };
+  }, [onCrossButtonClick, reset]);
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
+  const onSubmit: SubmitHandler<FormValues> = useCallback((data) => {
 
     if (product) {
       dispatch(postOrder({
@@ -113,7 +113,7 @@ const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallM
           }
         });
     }
-  };
+  }, [dispatch, product, onCrossButtonClick, reset]);
 
   return (
     <FocusTrap active={isFocusTrapActive}>
@@ -207,6 +207,8 @@ const CallMeModal = ({product, isModalActive = false, onCrossButtonClick}: CallM
       </div>
     </FocusTrap>
   );
-};
+});
+
+CallMeModal.displayName = 'CallMeModal';
 
 export default CallMeModal;
