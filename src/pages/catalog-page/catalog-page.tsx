@@ -8,6 +8,7 @@ import PromosSlider from '../../components/promos-slider/promos-slider';
 import ProductsList from '../../components/products-list/products-list';
 import CallMeModal from '../../components/call-me-modal/call-me-modal';
 import Loader from '../../components/loader/loader';
+import EmptyProducts from '../../components/empty-products/empty-products';
 import { TCamerasCard } from '../../types/cameras';
 import { AppRoutes } from '../../const';
 
@@ -69,9 +70,11 @@ const CatalogPage = (): JSX.Element => {
               <div className="catalog__aside">
                 <img src="img/banner.png" />
               </div>
+              {cardsData.length === 0 && <EmptyProducts />}
+              {cardsData.length !== 0 &&
               <div className="catalog__content">
                 <ProductsList cards={cardsData} onClick={handleProductCardButtonClick}/>
-              </div>
+              </div>}
             </div>
           </div>
         </section>
