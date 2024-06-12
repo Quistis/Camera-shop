@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
 import Banner from '../banner/banner';
@@ -10,7 +11,7 @@ type SliderProps = {
   promos: TImagePreview[];
 };
 
-const PromosSlider = ({ promos }: SliderProps): JSX.Element => (
+const PromosSlider = memo(({ promos }: SliderProps): JSX.Element => (
   <Swiper
     modules={[Pagination, Autoplay]}
     spaceBetween={50}
@@ -26,7 +27,8 @@ const PromosSlider = ({ promos }: SliderProps): JSX.Element => (
       </SwiperSlide>
     ))}
   </Swiper>
-);
+));
 
+PromosSlider.displayName = 'PromosSlider';
 
 export default PromosSlider;
