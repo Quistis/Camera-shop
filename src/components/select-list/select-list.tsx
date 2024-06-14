@@ -6,6 +6,8 @@ type SelectListProps = {
   onClick: () => void | null;
 };
 
+//TODO: навигация стрелочками!11!
+
 const SelectList = ({products, onClick}: SelectListProps): JSX.Element => (
   <ul className="form-search__select-list scroller">
     {products.map((product) => <SelectItem key={product.id} product={product} onClick={onClick}/>)}
