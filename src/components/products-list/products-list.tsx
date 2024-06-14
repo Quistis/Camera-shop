@@ -1,7 +1,6 @@
 import { memo } from 'react';
 import ProductCard from '../product-card/product-card';
 import { TCamerasCard } from '../../types/cameras';
-import './products-list.css';
 
 type ProductsListProps = {
   cards: TCamerasCard[];

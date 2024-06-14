@@ -1,5 +1,6 @@
 import { Outlet, Link } from 'react-router-dom';
 import { AppRoutes } from '../../const';
+import SearchForm from '../search-form/search-form';
 
 const Layout = (): JSX.Element => (
   <div className="wrapper">
@@ -38,6 +39,7 @@ const Layout = (): JSX.Element => (
             </li>
           </ul>
         </nav>
+        <SearchForm/>
       </div>
     </header>
 
