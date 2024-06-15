@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { SortType, SortDirection } from '../../types/sorting';
 
 type SortingProps = {
-    currentSortType: SortType;
-    currentSortDirection: SortDirection;
-    onSortChange: (type: SortType, direction: SortDirection) => void;
+  currentSortType: SortType;
+  currentSortDirection: SortDirection;
+  onSortChange: (type: SortType, direction: SortDirection) => void;
 };
 
 const Sorting = ({currentSortType, currentSortDirection, onSortChange }: SortingProps): JSX.Element => {
@@ -39,7 +39,7 @@ const Sorting = ({currentSortType, currentSortDirection, onSortChange }: Sorting
                 id="sortPrice"
                 name="sort"
                 checked={sortType === 'price'}
-                onClick={() => handleSortTypeChange('price')}
+                onChange={() => handleSortTypeChange('price')} // Используем onChange для радиокнопок
               />
               <label htmlFor="sortPrice">по цене</label>
             </div>
@@ -49,7 +49,7 @@ const Sorting = ({currentSortType, currentSortDirection, onSortChange }: Sorting
                 id="sortPopular"
                 name="sort"
                 checked={sortType === 'popularity'}
-                onClick={() => handleSortTypeChange('popularity')}
+                onChange={() => handleSortTypeChange('popularity')} // Используем onChange для радиокнопок
               />
               <label htmlFor="sortPopular">по популярности</label>
             </div>
@@ -61,8 +61,7 @@ const Sorting = ({currentSortType, currentSortDirection, onSortChange }: Sorting
                 id="up"
                 name="sort-icon"
                 checked={sortDirection === 'asc'}
-                aria-label="По возрастанию"
-                onClick={handleSortDirectionChange}
+                onChange={handleSortDirectionChange} // Используем onChange для чекбоксов
               />
               <label htmlFor="up">
                 <svg width={16} height={14} aria-hidden="true">
@@ -76,8 +75,7 @@ const Sorting = ({currentSortType, currentSortDirection, onSortChange }: Sorting
                 id="down"
                 name="sort-icon"
                 checked={sortDirection === 'desc'}
-                aria-label="По убыванию"
-                onClick={handleSortDirectionChange}
+                onChange={handleSortDirectionChange} // Используем onChange для чекбоксов
               />
               <label htmlFor="down">
                 <svg width={16} height={14} aria-hidden="true">
@@ -89,7 +87,6 @@ const Sorting = ({currentSortType, currentSortDirection, onSortChange }: Sorting
         </div>
       </form>
     </div>
-
   );
 };
 

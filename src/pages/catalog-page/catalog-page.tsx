@@ -6,6 +6,7 @@ import { selectCameraCards, selectCardsLoadingStatus } from '../../store/slices/
 import { selectPromosData, selectPromosLoadingStatus } from '../../store/slices/promos';
 import PromosSlider from '../../components/promos-slider/promos-slider';
 import ProductsList from '../../components/products-list/products-list';
+import FilterForm from '../../components/filter-form/filter-form';
 import Sorting from '../../components/sorting/sorting';
 import CallMeModal from '../../components/call-me-modal/call-me-modal';
 import Loader from '../../components/loader/loader';
@@ -16,6 +17,14 @@ import { AppRoutes } from '../../const';
 
 const DEFAULT_SORT_TYPE = 'price';
 const DEFAULT_SORT_DIRECTION = 'asc';
+
+type Filters = {
+  category: string;
+  type: string;
+  level: string;
+  priceMin: string;
+  priceMax: string;
+};
 
 const CatalogPage = (): JSX.Element => {
   const navigate = useNavigate();
@@ -33,14 +42,57 @@ const CatalogPage = (): JSX.Element => {
 
   const [sortType, setSortType] = useState<SortType>(initialSortType);
   const [sortDirection, setSortDirection] = useState<SortDirection>(initialSortDirection);
+  const [filters, setFilters] = useState<Filters>({
+    category: '',
+    type: '',
+    level: '',
+    priceMin: '',
+    priceMax: '',
+  });
 
   useEffect(() => {
     setSortType(initialSortType);
     setSortDirection(initialSortDirection);
   }, [initialSortType, initialSortDirection]);
 
+  const handleFilterChange = (newFilters: Filters) => {
+    setFilters(newFilters);
+  };
+
+  const filteredProducts = useMemo(() =>
+    cardsData.filter((card) => {
+      let isMatch = true;
+      if (filters.category && card.category !== filters.category) {
+        isMatch = false;
+      }
+      if (filters.type && card.type !== filters.type) {
+        isMatch = false;
+      }
+      if (filters.level && card.level !== filters.level) {
+        isMatch = false;
+      }
+      // if (filters.type && !filters.type.includes(card.type)) {
+      //   console.log(filters.type);
+      //   isMatch = false;
+      // }
+      // if (filters.level && !filters.level.includes(card.level)) {
+      //   console.log(filters.level);
+      //   isMatch = false;
+      // }
+      if (filters.priceMin && card.price < Number(filters.priceMin)) {
+        isMatch = false;
+      }
+      if (filters.priceMax && card.price > Number(filters.priceMax)) {
+        isMatch = false;
+      }
+      return isMatch;
+    }),
+  [cardsData, filters]
+  );
+
   const sortedProducts = useMemo(() => {
-    const sorted = [...cardsData].sort((a, b) => {
+
+    const sorted = [...filteredProducts].sort((a, b) => {
 
       let comparison = 0;
 
@@ -55,7 +107,7 @@ const CatalogPage = (): JSX.Element => {
 
     return sorted;
 
-  }, [cardsData, sortType, sortDirection]);
+  }, [sortType, sortDirection, filteredProducts]);
 
   if (isLoading || isPromosLoading) {
     return <Loader/>;
@@ -112,19 +164,36 @@ const CatalogPage = (): JSX.Element => {
           <div className="container">
             <h1 className="title title--h2">Каталог фото- и видеотехники</h1>
             <div className="page-content__columns">
-              <div className="catalog__aside">
-                <img src="img/banner.png" />
-              </div>
-              {cardsData.length === 0 && <EmptyProducts />}
-              {cardsData.length !== 0 &&
+              <FilterForm onFilterChange={handleFilterChange} filters={filters} />
+              {/* {cardsData.length === 0 && <EmptyProducts />} */}
+              {/* {cardsData.length !== 0 && */}
               <div className="catalog__content">
-                <Sorting
+                {filteredProducts.length === 0 ? (
+                  <>
+                    <Sorting
+                      currentSortType={sortType}
+                      currentSortDirection={sortDirection}
+                      onSortChange={handleSortChange}
+                    />
+                    <EmptyProducts />
+                  </>
+                ) : (
+                  <>
+                    <Sorting
+                      currentSortType={sortType}
+                      currentSortDirection={sortDirection}
+                      onSortChange={handleSortChange}
+                    />
+                    <ProductsList cards={sortedProducts} onClick={handleProductCardButtonClick}/>
+                  </>
+                )}
+                {/* <Sorting
                   currentSortType={sortType}
                   currentSortDirection={sortDirection}
                   onSortChange={handleSortChange}
                 />
-                <ProductsList cards={sortedProducts} onClick={handleProductCardButtonClick}/>
-              </div>}
+                <ProductsList cards={sortedProducts} onClick={handleProductCardButtonClick}/> */}
+              </div>
             </div>
           </div>
         </section>
