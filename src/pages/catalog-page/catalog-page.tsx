@@ -13,18 +13,11 @@ import Loader from '../../components/loader/loader';
 import EmptyProducts from '../../components/empty-products/empty-products';
 import { TCamerasCard } from '../../types/cameras';
 import { SortDirection, SortType } from '../../types/sorting';
+import { Filters } from '../../types/filters';
 import { AppRoutes } from '../../const';
 
 const DEFAULT_SORT_TYPE = 'price';
 const DEFAULT_SORT_DIRECTION = 'asc';
-
-type Filters = {
-  category: string;
-  type: string;
-  level: string;
-  priceMin: string;
-  priceMax: string;
-};
 
 const CatalogPage = (): JSX.Element => {
   const navigate = useNavigate();
@@ -44,8 +37,8 @@ const CatalogPage = (): JSX.Element => {
   const [sortDirection, setSortDirection] = useState<SortDirection>(initialSortDirection);
   const [filters, setFilters] = useState<Filters>({
     category: '',
-    type: '',
-    level: '',
+    types: [],
+    levels: [],
     priceMin: '',
     priceMax: '',
   });
@@ -62,33 +55,53 @@ const CatalogPage = (): JSX.Element => {
   const filteredProducts = useMemo(() =>
     cardsData.filter((card) => {
       let isMatch = true;
+
       if (filters.category && card.category !== filters.category) {
         isMatch = false;
       }
-      if (filters.type && card.type !== filters.type) {
+
+      if (filters.types && filters.types.length > 0 && !filters.types.includes(card.type)) {
         isMatch = false;
       }
-      if (filters.level && card.level !== filters.level) {
+
+      if (filters.levels && filters.levels.length > 0 && !filters.levels.includes(card.level)) {
         isMatch = false;
       }
-      // if (filters.type && !filters.type.includes(card.type)) {
-      //   console.log(filters.type);
-      //   isMatch = false;
-      // }
-      // if (filters.level && !filters.level.includes(card.level)) {
-      //   console.log(filters.level);
-      //   isMatch = false;
-      // }
+
       if (filters.priceMin && card.price < Number(filters.priceMin)) {
         isMatch = false;
       }
+
       if (filters.priceMax && card.price > Number(filters.priceMax)) {
         isMatch = false;
       }
+
       return isMatch;
     }),
   [cardsData, filters]
   );
+
+  const lowestPrice = useMemo(() => (
+    filteredProducts.length !== 0
+      ? Math.min(...filteredProducts.map((product) => product.price)).toString()
+      : ''
+  ), [filteredProducts]);
+
+  const highestPrice = useMemo(() => (
+    filteredProducts.length !== 0
+      ? Math.max(...filteredProducts.map((product) => product.price)).toString()
+      : ''
+  ), [filteredProducts]);
+
+  useEffect(() => {
+    if (lowestPrice !== filters.priceMin || highestPrice !== filters.priceMax) {
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        priceMin: lowestPrice,
+        priceMax: highestPrice,
+      }));
+    }
+  }, [lowestPrice, highestPrice, filters.priceMax, filters.priceMin]);
 
   const sortedProducts = useMemo(() => {
 
