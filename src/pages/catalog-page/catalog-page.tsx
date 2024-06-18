@@ -83,25 +83,15 @@ const CatalogPage = (): JSX.Element => {
 
   const lowestPrice = useMemo(() => (
     filteredProducts.length !== 0
-      ? Math.min(...filteredProducts.map((product) => product.price)).toString()
-      : ''
+      ? Math.min(...filteredProducts.map((product) => product.price))
+      : 0
   ), [filteredProducts]);
 
   const highestPrice = useMemo(() => (
     filteredProducts.length !== 0
-      ? Math.max(...filteredProducts.map((product) => product.price)).toString()
-      : ''
+      ? Math.max(...filteredProducts.map((product) => product.price))
+      : 0
   ), [filteredProducts]);
-
-  useEffect(() => {
-    if (lowestPrice !== filters.priceMin || highestPrice !== filters.priceMax) {
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        priceMin: lowestPrice,
-        priceMax: highestPrice,
-      }));
-    }
-  }, [lowestPrice, highestPrice, filters.priceMax, filters.priceMin]);
 
   const sortedProducts = useMemo(() => {
 
@@ -177,7 +167,12 @@ const CatalogPage = (): JSX.Element => {
           <div className="container">
             <h1 className="title title--h2">Каталог фото- и видеотехники</h1>
             <div className="page-content__columns">
-              <FilterForm onFilterChange={handleFilterChange} filters={filters} />
+              <FilterForm
+                onFilterChange={handleFilterChange}
+                filters={filters}
+                minPrice={lowestPrice}
+                maxPrice={highestPrice}
+              />
               {/* {cardsData.length === 0 && <EmptyProducts />} */}
               {/* {cardsData.length !== 0 && */}
               <div className="catalog__content">
