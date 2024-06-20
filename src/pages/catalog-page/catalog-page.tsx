@@ -48,10 +48,6 @@ const CatalogPage = (): JSX.Element => {
     setSortDirection(initialSortDirection);
   }, [initialSortType, initialSortDirection]);
 
-  const handleFilterChange = (newFilters: Filters) => {
-    setFilters(newFilters);
-  };
-
   const filteredProducts = useMemo(() =>
     cardsData.filter((card) => {
       let isMatch = true;
@@ -92,6 +88,10 @@ const CatalogPage = (): JSX.Element => {
       ? Math.max(...filteredProducts.map((product) => product.price))
       : 0
   ), [filteredProducts]);
+
+  const handleFilterChange = (newFilters: Filters) => {
+    setFilters(newFilters);
+  };
 
   const sortedProducts = useMemo(() => {
 

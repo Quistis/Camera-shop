@@ -29,40 +29,83 @@ const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice }: FilterFormP
     }
   };
 
-  const handlePriceMinChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    onFilterChange({
-      ...filters,
-      priceMin: value,
-    });
-  };
-
-  const handlePriceMaxChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    onFilterChange({
-      ...filters,
-      priceMax: value
-    });
-  };
   // const handlePriceMinChange = (event: ChangeEvent<HTMLInputElement>) => {
   //   const value = event.target.value;
-  //   if (value === '' || (Number(value) >= minPrice && Number(value) <= maxPrice)) { // Исправлено здесь
-  //     onFilterChange({
-  //       ...filters,
-  //       priceMin: value,
-  //     });
-  //   }
+
+  //   onFilterChange({
+  //     ...filters,
+  //     priceMin: value,
+  //   });
   // };
 
   // const handlePriceMaxChange = (event: ChangeEvent<HTMLInputElement>) => {
   //   const value = event.target.value;
-  //   if (value === '' || (Number(value) >= minPrice && Number(value) <= maxPrice)) { // Исправлено здесь
-  //     onFilterChange({
-  //       ...filters,
-  //       priceMax: value
-  //     });
-  //   }
+  //   onFilterChange({
+  //     ...filters,
+  //     priceMax: value
+  //   });
   // };
+  const handlePriceMinChange = (event: ChangeEvent<HTMLInputElement>) => {
+    let value = event.target.value;
+
+    if (value !== '' || (Number(value) >= Number(minPrice) && Number(value) <= Number(maxPrice))) {
+      onFilterChange({
+        ...filters,
+        priceMin: value,
+      });
+    } else if (Number(value) < Number(minPrice)) {
+      value = minPrice.toString();
+      onFilterChange({
+        ...filters,
+        priceMin: value,
+      });
+    }
+
+    if (Number(value) > Number(maxPrice)) {
+      value = maxPrice.toString();
+      onFilterChange({
+        ...filters,
+        priceMin: value,
+      });
+    }
+
+    // if (value === '') {
+    //   onFilterChange({
+    //     ...filters,
+    //     priceMin: '',
+    //   });
+    // }
+  };
+
+  const handlePriceMaxChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+
+    if (value !== '' || (Number(value) >= Number(minPrice) && Number(value) <= Number(maxPrice))) {
+      onFilterChange({
+        ...filters,
+        priceMax: value
+      });
+    } else if (Number(value) < Number(minPrice)) {
+      onFilterChange({
+        ...filters,
+        priceMax: minPrice.toString()
+      });
+    }
+
+    // if (Number(value) > Number(maxPrice)) {
+    //   onFilterChange({
+    //     ...filters,
+    //     priceMax: maxPrice.toString()
+    //   });
+    // }
+
+    // if (Number(value) < Number(minPrice)) {
+    //   onFilterChange({
+    //     ...filters,
+    //     priceMax: minPrice.toString(),
+    //   });
+    // }
+  };
 
   const handleLevelChange = (event: ChangeEvent<HTMLInputElement>) => {
     const valueMap: { [key: string]: string } = {
@@ -127,8 +170,8 @@ const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice }: FilterFormP
                   name="priceMin"
                   placeholder={`${minPrice}`}
                   value={filters.priceMin}
-                  min={minPrice}
-                  max={maxPrice}
+                  min={Number(minPrice)}
+                  max={Number(maxPrice)}
                   onChange={handlePriceMinChange}
                 />
               </label>
@@ -140,8 +183,8 @@ const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice }: FilterFormP
                   name="priceMax"
                   placeholder={`${maxPrice}`}
                   value={filters.priceMax}
-                  min={minPrice}
-                  max={maxPrice}
+                  min={Number(minPrice)}
+                  max={Number(maxPrice)}
                   onChange={handlePriceMaxChange}
                 />
               </label>
@@ -297,8 +340,8 @@ export default FilterForm;
 // type FilterFormProps = {
 //   onFilterChange: (filters: Filters) => void;
 //   filters: Filters;
-//   minPrice: string;
-//   maxPrice: string;
+//   minPrice: number;
+//   maxPrice: number;
 // };
 
 // // TODO: Доработать фильтрацию
