@@ -48,6 +48,9 @@ const CatalogPage = (): JSX.Element => {
     setSortDirection(initialSortDirection);
   }, [initialSortType, initialSortDirection]);
 
+  const [previousLowestPrice, setPreviousLowestPrice] = useState<number | null>(null);
+  const [previousHighestPrice, setPreviousHighestPrice] = useState<number | null>(null);
+
   const filteredProducts = useMemo(() =>
     cardsData.filter((card) => {
       let isMatch = true;
@@ -77,21 +80,47 @@ const CatalogPage = (): JSX.Element => {
   [cardsData, filters]
   );
 
-  const lowestPrice = useMemo(() => (
-    filteredProducts.length !== 0
-      ? Math.min(...filteredProducts.map((product) => product.price))
-      : 0
-  ), [filteredProducts]);
+  // const lowestPrice = useMemo(() => (
+  //   filteredProducts.length !== 0
+  //     ? Math.min(...filteredProducts.map((product) => product.price))
+  //     : 0
+  // ), [filteredProducts]);
 
-  const highestPrice = useMemo(() => (
-    filteredProducts.length !== 0
-      ? Math.max(...filteredProducts.map((product) => product.price))
-      : 0
-  ), [filteredProducts]);
+  // const highestPrice = useMemo(() => (
+  //   filteredProducts.length !== 0
+  //     ? Math.max(...filteredProducts.map((product) => product.price))
+  //     : 0
+  // ), [filteredProducts]);
 
   const handleFilterChange = (newFilters: Filters) => {
     setFilters(newFilters);
   };
+
+  const lowestPrice = useMemo(() => {
+    if (filteredProducts.length !== 0) {
+      const minPrice = Math.min(...filteredProducts.map((product) => product.price));
+      setPreviousLowestPrice(minPrice);
+      return minPrice;
+    }
+    return previousLowestPrice !== null ? previousLowestPrice : 0;
+  }, [filteredProducts, previousLowestPrice]);
+
+  const highestPrice = useMemo(() => {
+    if (filteredProducts.length !== 0) {
+      const maxPrice = Math.max(...filteredProducts.map((product) => product.price));
+      setPreviousHighestPrice(maxPrice);
+      return maxPrice;
+    }
+    return previousHighestPrice !== null ? previousHighestPrice : 0;
+  }, [filteredProducts, previousHighestPrice]);
+
+  const highestCataloguePrice = useMemo(() => {
+    if (cardsData.length !== 0) {
+      const maxPrice = Math.max(...cardsData.map((product) => product.price));
+      return maxPrice;
+    }
+    return previousHighestPrice !== null ? previousHighestPrice : 0;
+  }, [cardsData, previousHighestPrice]);
 
   const sortedProducts = useMemo(() => {
 
@@ -172,6 +201,7 @@ const CatalogPage = (): JSX.Element => {
                 filters={filters}
                 minPrice={lowestPrice}
                 maxPrice={highestPrice}
+                maxCataloguePrice={highestCataloguePrice}
               />
               {/* {cardsData.length === 0 && <EmptyProducts />} */}
               {/* {cardsData.length !== 0 && */}

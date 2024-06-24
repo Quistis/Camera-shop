@@ -6,9 +6,10 @@ type FilterFormProps = {
   filters: Filters;
   minPrice: number;
   maxPrice: number;
+  maxCataloguePrice: number;
 };
 
-const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice }: FilterFormProps): JSX.Element => {
+const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice, maxCataloguePrice }: FilterFormProps): JSX.Element => {
 
   const handleCategoryChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -29,24 +30,8 @@ const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice }: FilterFormP
     }
   };
 
-  // const handlePriceMinChange = (event: ChangeEvent<HTMLInputElement>) => {
-  //   const value = event.target.value;
-
-  //   onFilterChange({
-  //     ...filters,
-  //     priceMin: value,
-  //   });
-  // };
-
-  // const handlePriceMaxChange = (event: ChangeEvent<HTMLInputElement>) => {
-  //   const value = event.target.value;
-  //   onFilterChange({
-  //     ...filters,
-  //     priceMax: value
-  //   });
-  // };
   const handlePriceMinChange = (event: ChangeEvent<HTMLInputElement>) => {
-    let value = event.target.value;
+    const value = event.target.value;
 
     if (value !== '' || (Number(value) >= Number(minPrice) && Number(value) <= Number(maxPrice))) {
       onFilterChange({
@@ -54,27 +39,19 @@ const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice }: FilterFormP
         priceMin: value,
       });
     } else if (Number(value) < Number(minPrice)) {
-      value = minPrice.toString();
       onFilterChange({
         ...filters,
-        priceMin: value,
+        priceMin: minPrice.toString(),
       });
     }
 
-    if (Number(value) > Number(maxPrice)) {
-      value = maxPrice.toString();
+    if (Number(value) >= Number(maxPrice)) {
       onFilterChange({
         ...filters,
-        priceMin: value,
+        priceMin: filters.priceMax !== '' ? filters.priceMax : maxPrice.toString(),
       });
     }
 
-    // if (value === '') {
-    //   onFilterChange({
-    //     ...filters,
-    //     priceMin: '',
-    //   });
-    // }
   };
 
   const handlePriceMaxChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -85,26 +62,19 @@ const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice }: FilterFormP
         ...filters,
         priceMax: value
       });
-    } else if (Number(value) < Number(minPrice)) {
+    } else if (Number(value) < Number(filters.priceMin)) {
       onFilterChange({
         ...filters,
-        priceMax: minPrice.toString()
+        priceMax: filters.priceMin.toString()
       });
     }
 
-    // if (Number(value) > Number(maxPrice)) {
-    //   onFilterChange({
-    //     ...filters,
-    //     priceMax: maxPrice.toString()
-    //   });
-    // }
-
-    // if (Number(value) < Number(minPrice)) {
-    //   onFilterChange({
-    //     ...filters,
-    //     priceMax: minPrice.toString(),
-    //   });
-    // }
+    if (Number(value) > Number(maxCataloguePrice)) {
+      onFilterChange({
+        ...filters,
+        priceMax: maxCataloguePrice.toString(),
+      });
+    }
   };
 
   const handleLevelChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -170,8 +140,8 @@ const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice }: FilterFormP
                   name="priceMin"
                   placeholder={`${minPrice}`}
                   value={filters.priceMin}
-                  min={Number(minPrice)}
-                  max={Number(maxPrice)}
+                  // min={Number(minPrice)}
+                  // max={Number(maxPrice)}
                   onChange={handlePriceMinChange}
                 />
               </label>
@@ -183,8 +153,8 @@ const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice }: FilterFormP
                   name="priceMax"
                   placeholder={`${maxPrice}`}
                   value={filters.priceMax}
-                  min={Number(minPrice)}
-                  max={Number(maxPrice)}
+                  // min={Number(minPrice)}
+                  // max={Number(maxPrice)}
                   onChange={handlePriceMaxChange}
                 />
               </label>
