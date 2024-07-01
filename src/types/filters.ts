@@ -1,7 +1,7 @@
 export type Filters = {
   category: string;
-  types: string[] | null;
-  levels: string[] | null;
+  types: string[];
+  levels: string[];
   priceMin: string;
   priceMax: string;
 };

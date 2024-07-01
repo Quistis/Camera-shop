@@ -33,15 +33,19 @@ const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice, maxCatalogueP
   const handlePriceMinChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
 
-    if (value !== '' || (Number(value) >= Number(minPrice) && Number(value) <= Number(maxPrice))) {
+    if (value === '') {
       onFilterChange({
         ...filters,
         priceMin: value,
       });
-    } else if (Number(value) < Number(minPrice)) {
+
+      return;
+    }
+
+    if (value !== '' || (Number(value) >= Number(minPrice) && Number(value) <= Number(maxPrice))) {
       onFilterChange({
         ...filters,
-        priceMin: minPrice.toString(),
+        priceMin: value,
       });
     }
 
