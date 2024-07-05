@@ -559,14 +559,15 @@ const CatalogPage = (): JSX.Element => {
   const isPromosLoading = useAppSelector(selectPromosLoadingStatus);
   const [activeProduct, setActiveProduct] = useState<TCamerasCard | null>(null);
   const [isModalActive, setIsModalActive] = useState(false);
-  const [currentPage, setCurrentPage] = useState<string | number>(1);
 
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const initialSortType = queryParams.get('sortType') as SortType || DEFAULT_SORT_TYPE;
   const initialSortDirection = queryParams.get('sortDirection') as SortDirection || DEFAULT_SORT_DIRECTION;
+  const initialPaginationPage = queryParams.get('page') || 1;
 
   const [sortType, setSortType] = useState<SortType>(initialSortType);
   const [sortDirection, setSortDirection] = useState<SortDirection>(initialSortDirection);
+  const [currentPage, setCurrentPage] = useState<string | number>(initialPaginationPage);
   const [filters, setFilters] = useState<Filters>({
     category: queryParams.get('category') || '',
     types: queryParams.get('types')?.split(',') || [],
@@ -578,7 +579,8 @@ const CatalogPage = (): JSX.Element => {
   useEffect(() => {
     setSortType(initialSortType);
     setSortDirection(initialSortDirection);
-  }, [initialSortType, initialSortDirection]);
+    setCurrentPage(initialPaginationPage);
+  }, [initialSortType, initialSortDirection, initialPaginationPage]);
 
   useEffect(() => {
     const category = queryParams.get('category') || '';
@@ -599,7 +601,7 @@ const CatalogPage = (): JSX.Element => {
   const [previousLowestPrice, setPreviousLowestPrice] = useState<number | null>(null);
   const [previousHighestPrice, setPreviousHighestPrice] = useState<number | null>(null);
 
-  const updateQueryParams = (queryFilters: Filters) => {
+  const updateQueryParams = (queryFilters: Filters, page:number) => {
 
     if (queryFilters.category) {
       queryParams.set('category', queryFilters.category);
@@ -631,13 +633,30 @@ const CatalogPage = (): JSX.Element => {
       queryParams.delete('priceMax');
     }
 
+    queryParams.set('page', page.toString());
     navigate({ search: queryParams.toString() }, { replace: true });
   };
 
   const handleFilterChange = (newFilters: Filters) => {
+    const hasChanges =
+      newFilters.category !== filters.category ||
+      newFilters.types.join(',') !== filters.types.join(',') ||
+      newFilters.levels.join(',') !== filters.levels.join(',') ||
+      Number(newFilters.priceMin) !== Number(filters.priceMin) ||
+      Number(newFilters.priceMax) !== Number(filters.priceMax);
+
+    if (hasChanges) {
+      setCurrentPage(1);
+    }
+
     setFilters(newFilters);
-    setCurrentPage(1); // Сброс страницы на первую при смене фильтров
-    updateQueryParams(newFilters);
+    updateQueryParams(newFilters, Number(currentPage));
+  };
+
+  const handlePageChange = (page:number) => {
+    setCurrentPage(page);
+    queryParams.set('page', page.toString());
+    navigate({ search: queryParams.toString() }, { replace: true });
   };
 
   const filteredProducts = useMemo(() =>
@@ -816,7 +835,7 @@ const CatalogPage = (): JSX.Element => {
                       <PaginationList
                         pagesCount={pagesCount}
                         currentPage={Number(currentPage)}
-                        onPageChange={setCurrentPage}
+                        onPageChange={handlePageChange}
                       />
                     )}
                   </>
