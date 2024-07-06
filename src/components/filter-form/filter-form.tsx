@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { Filters } from '../../types/filters';
 
@@ -12,57 +12,68 @@ type FilterFormProps = {
 
 const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice, maxCataloguePrice }: FilterFormProps): JSX.Element => {
 
-  const [internalPriceMin, setInternalPriceMin] = useState<string>(filters.priceMin !== '' ? filters.priceMin.toString() : '');
-  const [internalPriceMax, setInternalPriceMax] = useState<string>(filters.priceMax !== '' ? filters.priceMax.toString() : '');
+  useEffect(() => {
+    if (filters.priceMax !== '' && Number(filters.priceMax) < Number(filters.priceMin)) {
+      onFilterChange({
+        ...filters,
+        priceMax: '',
+      });
+      toast.warn('Максимальная цена не должна быть меньше минимальной');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.priceMin]);
+
+  // const [internalPriceMin, setInternalPriceMin] = useState<string>(filters.priceMin !== '' ? filters.priceMin.toString() : '');
+  // const [internalPriceMax, setInternalPriceMax] = useState<string>(filters.priceMax !== '' ? filters.priceMax.toString() : '');
 
   //Тут эффект для минимальной цены (сюда переехало все из onPriceMinBlur)
-  useEffect(() => {
+  // useEffect(() => {
 
-    const delayDebounceFn = setTimeout(() => {
+  //   const delayDebounceFn = setTimeout(() => {
 
-      if (Number(internalPriceMin) < Number(minPrice) && Number(filters.priceMin !== '')) {
-        onFilterChange({
-          ...filters,
-          priceMin: minPrice.toString(),
-        });
+  //     if (Number(internalPriceMin) < Number(minPrice) && Number(filters.priceMin !== '')) {
+  //       onFilterChange({
+  //         ...filters,
+  //         priceMin: minPrice.toString(),
+  //       });
 
-      }
+  //     }
 
-      if (filters.priceMax !== '' && Number(filters.priceMax) < Number(filters.priceMin)) {
-        onFilterChange({
-          ...filters,
-          priceMax: '',
-        });
+  //     if (filters.priceMax !== '' && Number(filters.priceMax) < Number(filters.priceMin)) {
+  //       onFilterChange({
+  //         ...filters,
+  //         priceMax: '',
+  //       });
 
-        toast.warn('ТЫ ЧИВО НАДЕЛАЛ');
-      }
+  //       toast.warn('ТЫ ЧИВО НАДЕЛАЛ');
+  //     }
 
-    }, 700);
+  //   }, 700);
 
-    return () => clearTimeout(delayDebounceFn);
+  //   return () => clearTimeout(delayDebounceFn);
 
-  // }, [filters, filters.priceMin, internalPriceMin, minPrice, onFilterChange]);
-  }, [internalPriceMin, minPrice, filters.priceMin, filters.priceMax, onFilterChange, filters]);
+  // // }, [filters, filters.priceMin, internalPriceMin, minPrice, onFilterChange]);
+  // }, [internalPriceMin, minPrice, filters.priceMin, filters.priceMax, onFilterChange, filters]);
 
-  //Тут эффект для максимальной цены (сюда переехало все из onPriceMaxBlur)
-  useEffect(() => {
+  // //Тут эффект для максимальной цены (сюда переехало все из onPriceMaxBlur)
+  // useEffect(() => {
 
-    const delayDebounceFn = setTimeout(() => {
+  //   const delayDebounceFn = setTimeout(() => {
 
-      if (Number(internalPriceMax) < Number(minPrice) && Number(filters.priceMax !== '') && filters.priceMin !== '') {
-        onFilterChange({
-          ...filters,
-          priceMax: '',
-        });
-        toast.warn('Максимальная цена не должна быть меньше минимальной');
-      }
+  //     if (Number(internalPriceMax) < Number(minPrice) && Number(filters.priceMax !== '') && filters.priceMin !== '') {
+  //       onFilterChange({
+  //         ...filters,
+  //         priceMax: '',
+  //       });
+  //       toast.warn('Максимальная цена не должна быть меньше минимальной');
+  //     }
 
-    }, 500);
+  //   }, 500);
 
-    return () => clearTimeout(delayDebounceFn);
+  //   return () => clearTimeout(delayDebounceFn);
 
-  // }, [filters, filters.priceMin, internalPriceMax, minPrice, onFilterChange]);
-  }, [internalPriceMax, minPrice, filters.priceMin, filters.priceMax, onFilterChange, filters]);
+  // // }, [filters, filters.priceMin, internalPriceMax, minPrice, onFilterChange]);
+  // }, [internalPriceMax, minPrice, filters.priceMin, filters.priceMax, onFilterChange, filters]);
 
   const handlePriceMinChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -73,7 +84,7 @@ const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice, maxCatalogueP
         priceMin: value,
       });
 
-      setInternalPriceMin(value);
+      // setInternalPriceMin(value);
 
       return;
     }
@@ -84,9 +95,9 @@ const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice, maxCatalogueP
         priceMin: filters.priceMax !== '' ? filters.priceMax : maxPrice.toString(),
       });
 
-      setInternalPriceMin(filters.priceMax !== '' ? filters.priceMax : maxPrice.toString());
+      // setInternalPriceMin(filters.priceMax !== '' ? filters.priceMax : maxPrice.toString());
 
-      // toast.warn('Минимальная цена товара не может превышать максимальную цену товара');
+      toast.warn('Минимальная цена товара не может превышать максимальную цену товара');
 
       return;
     }
@@ -97,7 +108,7 @@ const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice, maxCatalogueP
         priceMin: value,
       });
 
-      setInternalPriceMin(value);
+      // setInternalPriceMin(value);
     }
 
   };
@@ -111,7 +122,7 @@ const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice, maxCatalogueP
         priceMax: value,
       });
 
-      setInternalPriceMax(value);
+      // setInternalPriceMax(value);
       return;
 
     }
@@ -130,7 +141,7 @@ const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice, maxCatalogueP
         priceMax: value
       });
 
-      setInternalPriceMax(value);
+      // setInternalPriceMax(value);
     }
 
     if (Number(value) > Number(maxCataloguePrice)) {
@@ -139,50 +150,50 @@ const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice, maxCatalogueP
         priceMax: maxCataloguePrice.toString(),
       });
 
-      setInternalPriceMax(maxCataloguePrice.toString());
+      // setInternalPriceMax(maxCataloguePrice.toString());
     }
   };
 
-  // const onMinPriceBlur = (event: ChangeEvent<HTMLInputElement>) => {
-  //   const value = event.target.value;
+  const onMinPriceBlur = (event: ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
 
-  //   if (Number(value) < Number(minPrice) && Number(filters.priceMin !== '')) {
-  //     onFilterChange({
-  //       ...filters,
-  //       priceMin: minPrice.toString(),
-  //     });
-  //   }
+    if (Number(value) < Number(minPrice) && Number(filters.priceMin !== '')) {
+      onFilterChange({
+        ...filters,
+        priceMin: minPrice.toString(),
+      });
+    }
 
-  //   if (filters.priceMax !== '' && Number(filters.priceMax) < Number(filters.priceMin)) {
-  //     onFilterChange({
-  //       ...filters,
-  //       priceMax: '',
-  //     });
-  //   }
+    if (filters.priceMax !== '' && Number(filters.priceMax) < Number(filters.priceMin)) {
+      onFilterChange({
+        ...filters,
+        priceMax: '',
+      });
+    }
 
-  // };
+  };
 
-  // const onMaxPriceBlur = (event: ChangeEvent<HTMLInputElement>) => {
-  //   const value = event.target.value;
+  const onMaxPriceBlur = (event: ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
 
-  //   if (Number(value) < Number(minPrice) && Number(filters.priceMax !== '') && filters.priceMin !== '') {
-  //     onFilterChange({
-  //       ...filters,
-  //       // priceMax: minPrice.toString()
-  //       priceMax: '',
-  //     });
-  //     toast.warn('Максимальная цена не должна быть меньше минимальной');
-  //   }
+    if (Number(value) < Number(minPrice) && Number(filters.priceMax !== '') && filters.priceMin !== '') {
+      onFilterChange({
+        ...filters,
+        // priceMax: minPrice.toString()
+        priceMax: '',
+      });
+      toast.warn('Максимальная цена не должна быть меньше минимальной');
+    }
 
-  //   // if (Number(value) < Number(filters.priceMin !== '' ? filters.priceMin : minPrice) && filters.priceMin === '' && value !== '') {
-  //   //   onFilterChange({
-  //   //     ...filters,
-  //   //     priceMax: '',
-  //   //   });
+    // if (Number(value) < Number(filters.priceMin !== '' ? filters.priceMin : minPrice) && filters.priceMin === '' && value !== '') {
+    //   onFilterChange({
+    //     ...filters,
+    //     priceMax: '',
+    //   });
 
-  //   //   toast.warn(`Значение не должно быть меньше минимальной цены: ${minPrice}`);
-  //   // }
-  // };
+    //   toast.warn(`Значение не должно быть меньше минимальной цены: ${minPrice}`);
+    // }
+  };
 
   const handleCategoryChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -251,8 +262,8 @@ const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice, maxCatalogueP
       priceMax: ''
     });
 
-    setInternalPriceMin('');
-    setInternalPriceMax('');
+    // setInternalPriceMin('');
+    // setInternalPriceMax('');
   };
 
   return (
@@ -272,7 +283,7 @@ const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice, maxCatalogueP
                   // min={Number(minPrice)}
                   // max={Number(maxPrice)}
                   onChange={handlePriceMinChange}
-                  // onBlur={onMinPriceBlur}
+                  onBlur={onMinPriceBlur}
                 />
               </label>
             </div>
@@ -286,7 +297,7 @@ const FilterForm = ({ onFilterChange, filters, minPrice, maxPrice, maxCatalogueP
                   // min={Number(minPrice)}
                   // max={Number(maxPrice)}
                   onChange={handlePriceMaxChange}
-                  // onBlur={onMaxPriceBlur}
+                  onBlur={onMaxPriceBlur}
                 />
               </label>
             </div>

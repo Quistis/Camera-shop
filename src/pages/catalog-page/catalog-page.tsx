@@ -638,19 +638,19 @@ const CatalogPage = (): JSX.Element => {
   };
 
   const handleFilterChange = (newFilters: Filters) => {
-    const hasChanges =
-      newFilters.category !== filters.category ||
-      newFilters.types.join(',') !== filters.types.join(',') ||
-      newFilters.levels.join(',') !== filters.levels.join(',') ||
-      Number(newFilters.priceMin) !== Number(filters.priceMin) ||
-      Number(newFilters.priceMax) !== Number(filters.priceMax);
+    // const hasChanges =
+    //   newFilters.category !== filters.category ||
+    //   newFilters.types.join(',') !== filters.types.join(',') ||
+    //   newFilters.levels.join(',') !== filters.levels.join(',') ||
+    //   Number(newFilters.priceMin) !== Number(filters.priceMin) ||
+    //   Number(newFilters.priceMax) !== Number(filters.priceMax);
 
-    if (hasChanges) {
-      setCurrentPage(1);
-    }
+    // if (hasChanges) {
+    setCurrentPage(1);
+    // }
 
     setFilters(newFilters);
-    updateQueryParams(newFilters, Number(currentPage));
+    updateQueryParams(newFilters, 1);
   };
 
   const handlePageChange = (page:number) => {

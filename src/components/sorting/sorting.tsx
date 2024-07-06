@@ -39,7 +39,7 @@ const Sorting = ({currentSortType, currentSortDirection, onSortChange }: Sorting
                 id="sortPrice"
                 name="sort"
                 checked={sortType === 'price'}
-                onChange={() => handleSortTypeChange('price')} // Используем onChange для радиокнопок
+                onChange={() => handleSortTypeChange('price')}
               />
               <label htmlFor="sortPrice">по цене</label>
             </div>
@@ -49,7 +49,7 @@ const Sorting = ({currentSortType, currentSortDirection, onSortChange }: Sorting
                 id="sortPopular"
                 name="sort"
                 checked={sortType === 'popularity'}
-                onChange={() => handleSortTypeChange('popularity')} // Используем onChange для радиокнопок
+                onChange={() => handleSortTypeChange('popularity')}
               />
               <label htmlFor="sortPopular">по популярности</label>
             </div>
@@ -61,7 +61,7 @@ const Sorting = ({currentSortType, currentSortDirection, onSortChange }: Sorting
                 id="up"
                 name="sort-icon"
                 checked={sortDirection === 'asc'}
-                onChange={handleSortDirectionChange} // Используем onChange для чекбоксов
+                onChange={handleSortDirectionChange}
               />
               <label htmlFor="up">
                 <svg width={16} height={14} aria-hidden="true">
@@ -75,7 +75,7 @@ const Sorting = ({currentSortType, currentSortDirection, onSortChange }: Sorting
                 id="down"
                 name="sort-icon"
                 checked={sortDirection === 'desc'}
-                onChange={handleSortDirectionChange} // Используем onChange для чекбоксов
+                onChange={handleSortDirectionChange}
               />
               <label htmlFor="down">
                 <svg width={16} height={14} aria-hidden="true">
