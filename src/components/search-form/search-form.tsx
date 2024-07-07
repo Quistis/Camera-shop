@@ -4,8 +4,6 @@ import { useAppSelector } from '../../hooks';
 import { selectCameraCards } from '../../store/slices/cameras';
 import SelectList from '../select-list/select-list';
 
-//TODO: реализовать навигацию по списку при помощи стрелок
-
 const SearchForm = (): JSX.Element => {
   const navigate = useNavigate();
   const [isSelectListOpened, setSelectListOpened] = useState(false);
