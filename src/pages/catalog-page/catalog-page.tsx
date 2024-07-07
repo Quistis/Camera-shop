@@ -530,7 +530,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useMemo, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useAppSelector } from '../../hooks';
-import { selectCameraCards, selectCardsLoadingStatus } from '../../store/slices/cameras';
+import { selectCameraCards, selectCardsLoadingStatus, selectCardsErrorStatus } from '../../store/slices/cameras';
 import { selectPromosData, selectPromosLoadingStatus } from '../../store/slices/promos';
 import PromosSlider from '../../components/promos-slider/promos-slider';
 import ProductsList from '../../components/products-list/products-list';
@@ -556,6 +556,7 @@ const CatalogPage = (): JSX.Element => {
   const cardsData = useAppSelector(selectCameraCards);
   const promosData = useAppSelector(selectPromosData);
   const isLoading = useAppSelector(selectCardsLoadingStatus);
+  const cardsErrorStatus = useAppSelector(selectCardsErrorStatus);
   const isPromosLoading = useAppSelector(selectPromosLoadingStatus);
   const [activeProduct, setActiveProduct] = useState<TCamerasCard | null>(null);
   const [isModalActive, setIsModalActive] = useState(false);
@@ -753,6 +754,10 @@ const CatalogPage = (): JSX.Element => {
 
   if (isLoading || isPromosLoading) {
     return <Loader />;
+  }
+
+  if (cardsErrorStatus) {
+    return <EmptyProducts/>;
   }
 
   const handleSortChange = (type: SortType, direction: SortDirection) => {

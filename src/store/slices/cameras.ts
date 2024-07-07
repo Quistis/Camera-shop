@@ -95,4 +95,7 @@ export const selectCardsLoadingStatus = (state: State): boolean => state[NameSpa
 export const selectCurrentProductLoadingStatus = (state: State): boolean => state[NameSpace.Cameras].currentProduct.loadingStatus;
 export const selectSimilarProductsLoadingStatus = (state: State): boolean => state[NameSpace.Cameras].similarProducts.loadingStatus;
 
+export const selectCardsErrorStatus = (state: State): boolean => state[NameSpace.Cameras].cards.errorStatus;
+export const selectCurrentProductErrorStatus = (state: State): boolean => state[NameSpace.Cameras].currentProduct.errorStatus;
+
 export const camerasReducer = CamerasSlice.reducer;
