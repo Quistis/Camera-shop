@@ -9,7 +9,7 @@ import ProductsList from '../../components/products-list/products-list';
 import FilterForm from '../../components/filter-form/filter-form';
 import Sorting from '../../components/sorting/sorting';
 import PaginationList from '../../components/pagination-list/pagination-list';
-import CallMeModal from '../../components/call-me-modal/call-me-modal';
+import AddToCartModal from '../../components/add-to-cart-modal/add-to-cart-modal';
 import Loader from '../../components/loader/loader';
 import EmptyProducts from '../../components/empty-products/empty-products';
 import { TCamerasCard } from '../../types/cameras';
@@ -295,7 +295,7 @@ const CatalogPage = (): JSX.Element => {
           </div>
         </section>
       </div>
-      <CallMeModal
+      <AddToCartModal
         product={activeProduct ? activeProduct : null}
         isModalActive={isModalActive}
         onCrossButtonClick={handleCrossButtonClick}

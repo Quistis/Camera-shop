@@ -9,7 +9,7 @@ import StarRating from '../../components/star-rating/star-rating';
 import ProductsSlider from '../../components/products-slider/products-slider';
 import ReviewsList from '../../components/reviews-list/reviews-list';
 import NotFoundPage from '../not-found-page/not-found-page';
-import CallMeModal from '../../components/call-me-modal/call-me-modal';
+import AddToCartModal from '../../components/add-to-cart-modal/add-to-cart-modal';
 import ScrollToTopButton from '../../components/scroll-to-top-button/scroll-to-top-button';
 import Loader from '../../components/loader/loader';
 import { TCamerasCard } from '../../types/cameras';
@@ -251,7 +251,7 @@ const ProductPage = (): JSX.Element => {
         </div>
       </main>
       <ScrollToTopButton/>
-      <CallMeModal
+      <AddToCartModal
         product={activeProduct}
         isModalActive={isModalActive}
         onCrossButtonClick={handleCrossButtonClick}
