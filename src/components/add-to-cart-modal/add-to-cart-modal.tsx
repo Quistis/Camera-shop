@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { selectCartProductIds, addProductToCart } from '../../store/slices/cart';
+import { selectCartItems, addProductToCart } from '../../store/slices/cart';
 import { saveCartState } from '../../utils/cartLocalStorage';
 import FocusTrap from 'focus-trap-react';
 // import { toast } from 'react-toastify';
@@ -30,7 +30,7 @@ const generateDescription = (cameraType = '', cameraCategory = ''): string => {
 const AddToCartModal = ({product, isModalActive = false, onCrossButtonClick}: AddToCartModalProps): JSX.Element => {
 
   const dispatch = useAppDispatch();
-  const cartProductIds = useAppSelector(selectCartProductIds);
+  const cartItems = useAppSelector(selectCartItems);
 
   const [isFocusTrapActive, setIsFocusTrapActive] = useState(false);
 
@@ -85,16 +85,20 @@ const AddToCartModal = ({product, isModalActive = false, onCrossButtonClick}: Ad
 
     }
   }, [onCrossButtonClick]);
+  //TODO: посмотреть на этот обработчик,второе условие вроде лишнее, мне не нужно добавлять продукт если он уже есть в массиве с таким ид
+  const handleAddProduct = (productId: number, productPrice: number) => {
+    const updatedCartItems = [...cartItems, { id: productId, quantity: 1, price: productPrice }];
 
-  const handleAddProduct = (productId: number) => {
-    const updatedCartProductIds = [...cartProductIds, productId];
-
-    if (!cartProductIds.includes(id)) {
-      dispatch(addProductToCart(productId));
-      saveCartState(updatedCartProductIds);
+    if (!cartItems.some((item) => item.id === id)) {
+      dispatch(addProductToCart({ id: productId, quantity: 1, price: productPrice }));
+      saveCartState(updatedCartItems);
+    } else {
+      const existingItem = cartItems.find((item) => item.id === id);
+      if (existingItem) {
+        dispatch(addProductToCart({ id: productId, quantity: 1, price: productPrice }));
+        saveCartState(updatedCartItems);
+      }
     }
-
-    // localStorage.clear();
   };
 
   return(
@@ -139,7 +143,7 @@ const AddToCartModal = ({product, isModalActive = false, onCrossButtonClick}: Ad
               <button
                 className="btn btn--purple modal__btn modal__btn--fit-width"
                 type="button"
-                onClick={() => handleAddProduct(id)}
+                onClick={() => handleAddProduct(id, price)}
               >
                 <svg width={24} height={16} aria-hidden="true">
                   <use xlinkHref="#icon-add-basket" />

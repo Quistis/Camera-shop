@@ -1,11 +1,11 @@
 import { Outlet, Link } from 'react-router-dom';
 import { useAppSelector } from '../../hooks';
-import { selectCartProductIds } from '../../store/slices/cart';
+import { selectCartItems } from '../../store/slices/cart';
 import { AppRoutes } from '../../const';
 import SearchForm from '../search-form/search-form';
 
 const Layout = (): JSX.Element => {
-  const cartProductIds = useAppSelector(selectCartProductIds);
+  const cartItems = useAppSelector(selectCartItems);
 
   return (
     <div className="wrapper">
@@ -49,8 +49,8 @@ const Layout = (): JSX.Element => {
             <svg width={16} height={16} aria-hidden="true">
               <use xlinkHref="#icon-basket" />
             </svg>
-            {cartProductIds.length !== 0 &&
-            <span className="header__basket-count">{cartProductIds.length}</span>}
+            {cartItems.length !== 0 &&
+            <span className="header__basket-count">{cartItems.length}</span>}
 
           </Link>
         </div>

@@ -9,9 +9,9 @@ import { loadCartState } from './utils/cartLocalStorage';
 import App from './components/app/app';
 import 'react-toastify/dist/ReactToastify.css';
 //TODO: Изменения тут, чтобы хранить количество
-const cartProductIds = loadCartState();
+const cartItems = loadCartState();
 
-store.dispatch(setCartProducts(cartProductIds));
+store.dispatch(setCartProducts(cartItems));
 store.dispatch(fetchCameras());
 store.dispatch(fetchPromos());
 

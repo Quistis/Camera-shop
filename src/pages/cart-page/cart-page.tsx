@@ -3,24 +3,31 @@ import { useNavigate } from 'react-router-dom';
 import CartItem from '../../components/cart-item/cart-item';
 import { useAppSelector } from '../../hooks';
 import { selectCameraCards } from '../../store/slices/cameras';
-import { selectCartProductIds } from '../../store/slices/cart';
+import { selectCartItems } from '../../store/slices/cart';
 import { AppRoutes } from '../../const';
 import { toast } from 'react-toastify';
 
-//TODO: Изменения тут для подсчета кол-ва,цены и тд
+//TODO: Изменения тут для подсчета кол-ва,цены и тд, тут в переменной cartCards тот же самый тип что и TCamerasCard, только есть поле quantity, надо сделать под него тип
 const CartPage = (): JSX.Element => {
   const navigate = useNavigate();
   const cardsData = useAppSelector(selectCameraCards);
-  const cartProductIds = useAppSelector(selectCartProductIds);
+  const cartItems = useAppSelector(selectCartItems);
 
-  const cartCards = cardsData.filter((card) => cartProductIds.includes(card.id));
+  const cartCards = cardsData.filter((card) =>
+    cartItems.some((item) => item.id === card.id)
+  ).map((card) => ({
+    ...card,
+    quantity: cartItems.find((item) => item.id === card.id)?.quantity || 1,
+  }));
+
+  const totalPrice = cartCards.reduce((total, item) => total + item.price * item.quantity, 0);
 
   useEffect(() => {
-    if (cartProductIds.length === 0) {
+    if (cartItems.length === 0) {
       navigate(AppRoutes.Main);
       toast.warn('Корзина пуста, переходим в каталог');
     }
-  }, [cartProductIds.length, navigate]);
+  }, [cartItems.length, navigate]);
 
   return (
     <main>
@@ -78,7 +85,7 @@ const CartPage = (): JSX.Element => {
               <div className="basket__summary-order">
                 <p className="basket__summary-item">
                   <span className="basket__summary-text">Всего:</span>
-                  <span className="basket__summary-value">111 390 ₽</span>
+                  <span className="basket__summary-value">{totalPrice.toLocaleString('ru-RU')} ₽</span>
                 </p>
                 <p className="basket__summary-item">
                   <span className="basket__summary-text">Скидка:</span>

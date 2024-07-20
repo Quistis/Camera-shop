@@ -1,10 +1,17 @@
+import { useState, FocusEvent, ChangeEvent } from 'react';
 import { useAppSelector, useAppDispatch } from '../../hooks';
-import { selectCartProductIds, removeProductFromCart } from '../../store/slices/cart';
+import { selectCartItems, updateProductQuantity, removeProductFromCart } from '../../store/slices/cart';
+import { saveCartState } from '../../utils/cartLocalStorage';
 import { TCamerasCard } from '../../types/cameras';
+import { toast } from 'react-toastify';
 
-//TODO: изменения тут для подсчета цены, кол-ва и тд
+const QUANTITY_CHANGE_STEP = 1;
+interface TCamerasCardWithQuantity extends TCamerasCard {
+  quantity: number;
+}
+
 type CartItemProps = {
-  product: TCamerasCard;
+  product: TCamerasCardWithQuantity;
 };
 
 const generateDescription = (cameraType = '', cameraCategory = ''): string => {
@@ -23,15 +30,58 @@ const generateDescription = (cameraType = '', cameraCategory = ''): string => {
 
 const CartItem = ({product}: CartItemProps): JSX.Element => {
   const dispatch = useAppDispatch();
-  const {id, name, type, category, price, level, previewImg, previewImg2x, previewImgWebp, previewImgWebp2x, vendorCode} = product;
-  const cartProductIds = useAppSelector(selectCartProductIds);
+  const {id, name, type, category, price, quantity, level, previewImg, previewImg2x, previewImgWebp, previewImgWebp2x, vendorCode} = product;
+  const cartItems = useAppSelector(selectCartItems);
 
-  const handleCrossButtonClick = (productId:number) => {
+  const [inputQuantity, setInputQuantity] = useState<number | string>(quantity);
 
-    const updatedProductIds = cartProductIds.filter((item) => item !== productId);
-    localStorage.setItem('cart', JSON.stringify(updatedProductIds));
-
+  //TODO: Эта штука должна открывать попап с подтверждением удаления позиции из корзины, доделать
+  const handleCrossButtonClick = (productId: number) => {
+    const updatedItems = cartItems.filter((item) => item.id !== productId);
+    saveCartState(updatedItems);
     dispatch(removeProductFromCart(productId));
+  };
+
+  const handleQuantityChange = (newQuantity: number) => {
+    if (newQuantity > 0 && newQuantity <= 9) {
+      setInputQuantity(newQuantity);
+
+      const updatedItems = cartItems.map((item) =>
+        item.id === id ? { ...item, quantity: newQuantity } : item
+      );
+
+      saveCartState(updatedItems);
+      dispatch(updateProductQuantity({ id, quantity: newQuantity }));
+    } else {
+      toast.warn('Количество товара не может быть меньше 1 и больше 9');
+    }
+  };
+
+  const handleQuantityInputBlur = (evt: FocusEvent<HTMLInputElement>) => {
+    const target = evt.target as HTMLInputElement;
+
+    if (target.value === '' || Number(target.value) < 1) {
+      target.value = '1';
+    }
+
+    if (Number(target.value) > 9) {
+      target.value = '9';
+    }
+
+    setInputQuantity(Number(target.value));
+
+    const updatedItems = cartItems.map((item) =>
+      item.id === id ? { ...item, quantity: Number(target.value) } : item
+    );
+
+    saveCartState(updatedItems);
+    dispatch(updateProductQuantity({ id, quantity: Number(target.value) }));
+  };
+
+  const handleInputChange = (evt: ChangeEvent<HTMLInputElement>) => {
+    const target = evt.target as HTMLInputElement;
+    const newValue = target.value === '' ? '' : Number(target.value);
+    setInputQuantity(newValue);
   };
 
   return (
@@ -69,6 +119,7 @@ const CartItem = ({product}: CartItemProps): JSX.Element => {
         <button
           className="btn-icon btn-icon--prev"
           aria-label="уменьшить количество товара"
+          onClick={() => handleQuantityChange(quantity - QUANTITY_CHANGE_STEP)}
         >
           <svg width={7} height={12} aria-hidden="true">
             <use xlinkHref="#icon-arrow" />
@@ -78,14 +129,18 @@ const CartItem = ({product}: CartItemProps): JSX.Element => {
         <input
           type="number"
           id="counter1"
-          defaultValue={1}
-          min={1}
-          max={99}
+          // defaultValue={inputQuantity}
+          value={inputQuantity}
+          // min={1}
+          // max={9}
           aria-label="количество товара"
+          onChange={handleInputChange}
+          onBlur={handleQuantityInputBlur}
         />
         <button
           className="btn-icon btn-icon--next"
           aria-label="увеличить количество товара"
+          onClick={() => handleQuantityChange(quantity + QUANTITY_CHANGE_STEP)}
         >
           <svg width={7} height={12} aria-hidden="true">
             <use xlinkHref="#icon-arrow" />
@@ -93,7 +148,7 @@ const CartItem = ({product}: CartItemProps): JSX.Element => {
         </button>
       </div>
       <div className="basket-item__total-price">
-        <span className="visually-hidden">Общая цена:</span>37 940 ₽
+        <span className="visually-hidden">Общая цена:</span>{(price * quantity).toLocaleString('ru-RU')} ₽
       </div>
       <button
         className="cross-btn"
