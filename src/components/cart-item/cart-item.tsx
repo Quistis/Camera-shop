@@ -1,6 +1,6 @@
 import { useState, FocusEvent, ChangeEvent } from 'react';
 import { useAppSelector, useAppDispatch } from '../../hooks';
-import { selectCartItems, updateProductQuantity, removeProductFromCart } from '../../store/slices/cart';
+import { selectCartItems, updateProductQuantity } from '../../store/slices/cart';
 import { saveCartState } from '../../utils/cartLocalStorage';
 import { TCamerasCard } from '../../types/cameras';
 import { toast } from 'react-toastify';
@@ -12,6 +12,7 @@ interface TCamerasCardWithQuantity extends TCamerasCard {
 
 type CartItemProps = {
   product: TCamerasCardWithQuantity;
+  onCartItemRemoveButtonClick?: (product?: TCamerasCard) => void | null;
 };
 
 const generateDescription = (cameraType = '', cameraCategory = ''): string => {
@@ -28,7 +29,7 @@ const generateDescription = (cameraType = '', cameraCategory = ''): string => {
   return description;
 };
 
-const CartItem = ({product}: CartItemProps): JSX.Element => {
+const CartItem = ({product, onCartItemRemoveButtonClick}: CartItemProps): JSX.Element => {
   const dispatch = useAppDispatch();
   const {id, name, type, category, price, quantity, level, previewImg, previewImg2x, previewImgWebp, previewImgWebp2x, vendorCode} = product;
   const cartItems = useAppSelector(selectCartItems);
@@ -36,10 +37,13 @@ const CartItem = ({product}: CartItemProps): JSX.Element => {
   const [inputQuantity, setInputQuantity] = useState<number | string>(quantity);
 
   //TODO: Эта штука должна открывать попап с подтверждением удаления позиции из корзины, доделать
-  const handleCrossButtonClick = (productId: number) => {
-    const updatedItems = cartItems.filter((item) => item.id !== productId);
-    saveCartState(updatedItems);
-    dispatch(removeProductFromCart(productId));
+  const handleCrossButtonClick = () => {
+    // const updatedItems = cartItems.filter((item) => item.id !== productId);
+    // saveCartState(updatedItems);
+    // dispatch(removeProductFromCart(productId));
+    if (onCartItemRemoveButtonClick) {
+      onCartItemRemoveButtonClick(product);
+    }
   };
 
   const handleQuantityChange = (newQuantity: number) => {
@@ -154,7 +158,7 @@ const CartItem = ({product}: CartItemProps): JSX.Element => {
         className="cross-btn"
         type="button"
         aria-label="Удалить товар"
-        onClick={() => handleCrossButtonClick(id)}
+        onClick={handleCrossButtonClick}
       >
         <svg width={10} height={10} aria-hidden="true">
           <use xlinkHref="#icon-close" />

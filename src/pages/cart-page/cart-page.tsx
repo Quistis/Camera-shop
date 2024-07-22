@@ -1,17 +1,22 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CartItem from '../../components/cart-item/cart-item';
+import RemoveCartItemModal from '../../components/remove-cart-item-modal/remove-cart-item-modal';
 import { useAppSelector } from '../../hooks';
 import { selectCameraCards } from '../../store/slices/cameras';
 import { selectCartItems } from '../../store/slices/cart';
 import { AppRoutes } from '../../const';
 import { toast } from 'react-toastify';
+import { TCamerasCard } from '../../types/cameras';
 
 //TODO: Изменения тут для подсчета кол-ва,цены и тд, тут в переменной cartCards тот же самый тип что и TCamerasCard, только есть поле quantity, надо сделать под него тип
 const CartPage = (): JSX.Element => {
   const navigate = useNavigate();
   const cardsData = useAppSelector(selectCameraCards);
   const cartItems = useAppSelector(selectCartItems);
+
+  const [activeProduct, setActiveProduct] = useState<TCamerasCard | null>(null);
+  const [isModalActive, setIsModalActive] = useState(false);
 
   const cartCards = cardsData.filter((card) =>
     cartItems.some((item) => item.id === card.id)
@@ -28,6 +33,17 @@ const CartPage = (): JSX.Element => {
       toast.warn('Корзина пуста, переходим в каталог');
     }
   }, [cartItems.length, navigate]);
+
+  const handleRemoveCartItemButtonClick = (product?: TCamerasCard) => {
+    if (product) {
+      setActiveProduct(product);
+      setIsModalActive(true);
+    }
+  };
+
+  const handleCrossButtonClick = () => {
+    setIsModalActive(false);
+  };
 
   return (
     <main>
@@ -63,7 +79,7 @@ const CartPage = (): JSX.Element => {
           <div className="container">
             <h1 className="title title--h2">Корзина</h1>
             <ul className="basket__list">
-              {cartCards.map((card) => <CartItem key={card.id} product={card} />)}
+              {cartCards.map((card) => <CartItem key={card.id} product={card} onCartItemRemoveButtonClick={handleRemoveCartItemButtonClick} />)}
             </ul>
             <div className="basket__summary">
               <div className="basket__promo">
@@ -109,6 +125,11 @@ const CartPage = (): JSX.Element => {
           </div>
         </section>
       </div>
+      <RemoveCartItemModal
+        product={activeProduct}
+        isModalActive={isModalActive}
+        onCrossButtonClick={handleCrossButtonClick}
+      />
     </main>
 
   );
