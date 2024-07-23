@@ -10,6 +10,7 @@ import ProductsSlider from '../../components/products-slider/products-slider';
 import ReviewsList from '../../components/reviews-list/reviews-list';
 import NotFoundPage from '../not-found-page/not-found-page';
 import AddToCartModal from '../../components/add-to-cart-modal/add-to-cart-modal';
+import AddToCartSuccessModal from '../../components/add-to-cart-success-modal/add-to-cart-success-modal';
 import ScrollToTopButton from '../../components/scroll-to-top-button/scroll-to-top-button';
 import Loader from '../../components/loader/loader';
 import { TCamerasCard } from '../../types/cameras';
@@ -22,6 +23,7 @@ const ProductPage = (): JSX.Element => {
   const [visibleReviewsCount, setVisibleReviewsCount] = useState(3);
   const [activeProduct, setActiveProduct] = useState<TCamerasCard | null>(null);
   const [isModalActive, setIsModalActive] = useState(false);
+  const [isSuccessModalActive, setIsSuccessModalActive] = useState(false);
 
   const currentProduct = useAppSelector(selectCurrentProduct);
   const similarProducts = useAppSelector(selectSimilarProducts);
@@ -93,6 +95,15 @@ const ProductPage = (): JSX.Element => {
     setIsModalActive(false);
   };
 
+  const handleAddToCartButtonClick = () => {
+    setIsModalActive(false);
+    setIsSuccessModalActive(true);
+  };
+
+  const handleCloseSuccessModalCrossButtonClick = () => {
+    setIsSuccessModalActive(false);
+  };
+
   return (
     <>
       <main>
@@ -156,7 +167,11 @@ const ProductPage = (): JSX.Element => {
                     <span className="visually-hidden">Цена:</span>{price.toLocaleString('ru-RU')} ₽
                   </p>
 
-                  <button className="btn btn--purple" type="button">
+                  <button
+                    className="btn btn--purple"
+                    type="button"
+                    onClick={() => handleProductCardBuyButtonClick(currentProduct)}
+                  >
                     <svg width={24} height={16} aria-hidden="true">
                       <use xlinkHref="#icon-add-basket" />
                     </svg>
@@ -255,6 +270,11 @@ const ProductPage = (): JSX.Element => {
         product={activeProduct}
         isModalActive={isModalActive}
         onCrossButtonClick={handleCrossButtonClick}
+        onAddProductButtonClick={handleAddToCartButtonClick}
+      />
+      <AddToCartSuccessModal
+        isModalActive={isSuccessModalActive}
+        onCrossButtonClick={handleCloseSuccessModalCrossButtonClick}
       />
     </>
   );

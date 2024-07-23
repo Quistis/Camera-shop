@@ -25,13 +25,15 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     addProductToCart: (state, action: PayloadAction<TCartItem>) => {
-      // const existingItem = state.cart.cartProducts.find((item) => item.id === action.payload.id);
-      // if (existingItem) {
-      //   existingItem.quantity += action.payload.quantity;
-      // } else {
+      const existingItem = state.cart.cartProducts.find((item) => item.id === action.payload.id);
+      if (existingItem) {
+        // existingItem.quantity += action.payload.quantity;
+        existingItem.quantity += 1;
+      }
+      // else {
       //   state.cart.cartProducts.push(action.payload);
       // }
-      const existingItem = state.cart.cartProducts.find((item) => item.id === action.payload.id);
+      // const existingItem = state.cart.cartProducts.find((item) => item.id === action.payload.id);
       if (!existingItem) {
         state.cart.cartProducts.push(action.payload);
       }

@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { selectCartItems, addProductToCart } from '../../store/slices/cart';
 import { saveCartState } from '../../utils/cartLocalStorage';
@@ -11,6 +12,7 @@ type AddToCartModalProps = {
   product: TCamerasCard | null;
   isModalActive: boolean;
   onCrossButtonClick?: () => void | null;
+  onAddProductButtonClick?: () => void | null;
 };
 
 const generateDescription = (cameraType = '', cameraCategory = ''): string => {
@@ -27,7 +29,7 @@ const generateDescription = (cameraType = '', cameraCategory = ''): string => {
   return description;
 };
 
-const AddToCartModal = ({product, isModalActive = false, onCrossButtonClick}: AddToCartModalProps): JSX.Element => {
+const AddToCartModal = ({product, isModalActive = false, onCrossButtonClick, onAddProductButtonClick}: AddToCartModalProps): JSX.Element => {
 
   const dispatch = useAppDispatch();
   const cartItems = useAppSelector(selectCartItems);
@@ -86,19 +88,57 @@ const AddToCartModal = ({product, isModalActive = false, onCrossButtonClick}: Ad
     }
   }, [onCrossButtonClick]);
   //TODO: посмотреть на этот обработчик,второе условие вроде лишнее, мне не нужно добавлять продукт если он уже есть в массиве с таким ид
-  const handleAddProduct = (productId: number, productPrice: number) => {
-    const updatedCartItems = [...cartItems, { id: productId, quantity: 1, price: productPrice }];
+  // const handleAddProduct = (productId: number, productPrice: number) => {
+  //   const updatedCartItems = [...cartItems, { id: productId, quantity: 1, price: productPrice }];
 
-    if (!cartItems.some((item) => item.id === id)) {
-      dispatch(addProductToCart({ id: productId, quantity: 1, price: productPrice }));
-      saveCartState(updatedCartItems);
-    } else {
-      const existingItem = cartItems.find((item) => item.id === id);
-      if (existingItem) {
+  //   if (!cartItems.some((item) => item.id === id)) {
+  //     dispatch(addProductToCart({ id: productId, quantity: 1, price: productPrice }));
+  //     saveCartState(updatedCartItems);
+  //   // }
+  //   } else {
+  //     const existingItem = cartItems.find((item) => item.id === id);
+  //     if (existingItem) {
+  //       dispatch(addProductToCart({ id: productId, quantity: 1, price: productPrice }));
+  //       saveCartState(updatedCartItems);
+  //     }
+  //   }
+
+  //   if (onAddProductButtonClick) {
+  //     onAddProductButtonClick();
+  //   }
+  // };
+  const handleAddProduct = (productId: number, productPrice: number) => {
+    const existingItem = cartItems.find((item) => item.id === productId);
+
+    if (existingItem) {
+      if (existingItem.quantity < 9) {
+        const updatedCartItems = cartItems.map((item) =>
+          item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
+        );
+
         dispatch(addProductToCart({ id: productId, quantity: 1, price: productPrice }));
         saveCartState(updatedCartItems);
+
+        if (onAddProductButtonClick) {
+          onAddProductButtonClick();
+        }
+      } else {
+        toast.warn('Максимальное количество товара в корзине: 9.');
+      }
+    } else {
+      const updatedCartItems = [...cartItems, { id: productId, quantity: 1, price: productPrice }];
+
+      dispatch(addProductToCart({ id: productId, quantity: 1, price: productPrice }));
+      saveCartState(updatedCartItems);
+
+      if (onAddProductButtonClick) {
+        onAddProductButtonClick();
       }
     }
+
+    // if (onAddProductButtonClick) {
+    //   onAddProductButtonClick();
+    // }
   };
 
   return(

@@ -28,6 +28,11 @@ const CartPage = (): JSX.Element => {
   const totalPrice = cartCards.reduce((total, item) => total + item.price * item.quantity, 0);
 
   useEffect(() => {
+    // Прокрутка страницы наверх при монтировании компонента
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     if (cartItems.length === 0) {
       navigate(AppRoutes.Main);
       toast.warn('Корзина пуста, переходим в каталог');

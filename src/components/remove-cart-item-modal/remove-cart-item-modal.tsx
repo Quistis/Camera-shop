@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
+import FocusTrap from 'focus-trap-react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { selectCartItems, removeProductFromCart } from '../../store/slices/cart';
 import { saveCartState } from '../../utils/cartLocalStorage';
-import FocusTrap from 'focus-trap-react';
 import { TCamerasCard } from '../../types/cameras';
 import { generateDescription } from '../../utils/utils';
 import { AppRoutes } from '../../const';
@@ -88,7 +88,7 @@ const RemoveCartItemModal = ({product, isModalActive, onCrossButtonClick}: AddTo
       <div className={`modal ${isModalActive ? 'is-active' : ''}`}>
         <div className="modal__wrapper">
           <div className="modal__overlay" onClick={handleCrossButtonClick} />
-          <div className="modal__content">
+          <div className="modal__content modal--min-width">
             <p className="title title--h4">Удалить этот товар?</p>
             <div className="basket-item basket-item--short">
               <div className="basket-item__img">
