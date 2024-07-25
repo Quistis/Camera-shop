@@ -8,7 +8,7 @@ import { TImagePreview } from '../types/banners';
 
 type TOrder = {
   camerasIds: number[];
-  tel: string;
+  // tel: string;
   coupon: string | null;
 };
 
@@ -80,9 +80,9 @@ export const postOrder = createAsyncThunk<void, TOrder, {
   extra: AxiosInstance;
 }>(
   'orders/postOrder',
-  async({tel, camerasIds, coupon}, {extra: api}) => {
+  async({camerasIds, coupon}, {extra: api}) => {
 
-    await api.post<void>(APIRoute.Order, {tel, camerasIds, coupon});
+    await api.post<void>(APIRoute.Order, {camerasIds, coupon});
 
   }
 );

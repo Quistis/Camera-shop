@@ -1,19 +1,22 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import CartItem from '../../components/cart-item/cart-item';
 import RemoveCartItemModal from '../../components/remove-cart-item-modal/remove-cart-item-modal';
-import { useAppSelector } from '../../hooks';
+import EmptyProducts from '../../components/empty-products/empty-products';
+import { useAppSelector, useAppDispatch } from '../../hooks';
 import { selectCameraCards } from '../../store/slices/cameras';
+import { selectPromosData } from '../../store/slices/promos';
 import { selectCartItems } from '../../store/slices/cart';
+import { postOrder } from '../../store/api-actions';
 import { AppRoutes } from '../../const';
-import { toast } from 'react-toastify';
 import { TCamerasCard } from '../../types/cameras';
+import { TCartItem } from '../../store/slices/cart';
 
 //TODO: Изменения тут для подсчета кол-ва,цены и тд, тут в переменной cartCards тот же самый тип что и TCamerasCard, только есть поле quantity, надо сделать под него тип
 const CartPage = (): JSX.Element => {
-  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const cardsData = useAppSelector(selectCameraCards);
   const cartItems = useAppSelector(selectCartItems);
+  const promoItems = useAppSelector(selectPromosData);
 
   const [activeProduct, setActiveProduct] = useState<TCamerasCard | null>(null);
   const [isModalActive, setIsModalActive] = useState(false);
@@ -25,19 +28,85 @@ const CartPage = (): JSX.Element => {
     quantity: cartItems.find((item) => item.id === card.id)?.quantity || 1,
   }));
 
-  const totalPrice = cartCards.reduce((total, item) => total + item.price * item.quantity, 0);
+  const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+
+  const cartItemsIds = cartItems.map((items) => items.id);
+  const promoItemsIds = promoItems.map((item) => item.id);
+  const cartItemsWithoutPromos = cartItems.filter((item) => !promoItemsIds.some((promoId) => promoId === item.id));
+
+  const calculateDiscount = (products: TCartItem[]): number => {
+
+    let discountValue = 0;
+
+    const totalQuantity = products.reduce((accumulator, currentValue) => accumulator + currentValue.quantity, 0);
+    const totalPriceWithoutPromos = products.reduce((total, item) => total + item.price * item.quantity, 0);
+
+    if (totalQuantity === 2) {
+      // console.log('Общее количество:' + totalQuantity);
+      discountValue = 3;
+      // console.log('Скидка:' + discountValue.toString());
+    }
+
+    if (totalQuantity >= 3 && totalQuantity <= 5) {
+      // console.log('Общее количество:' + totalQuantity);
+      discountValue = 5;
+      // console.log('Скидка:' + discountValue.toString());
+    }
+
+    if (totalQuantity >= 6 && totalQuantity <= 10) {
+      // console.log('Общее количество:' + totalQuantity);
+      discountValue = 10;
+      // console.log('Скидка:' + discountValue.toString());
+    }
+
+    if (totalQuantity > 10) {
+      // console.log('Общее количество:' + totalQuantity);
+      discountValue = 15;
+      // console.log('Скидка:' + discountValue.toString());
+    }
+
+    if (totalQuantity > 1) {
+      if (totalPriceWithoutPromos >= 10000 && totalPriceWithoutPromos < 20000) {
+        // console.log('Общая цена:' + totalPrice1);
+        discountValue -= 1;
+        // console.log('Скидка:' + discountValue.toString());
+      }
+
+      if (totalPriceWithoutPromos >= 20000 && totalPriceWithoutPromos < 30000) {
+        // console.log('Общая цена:' + totalPrice1);
+        discountValue -= 2;
+        // console.log('Скидка:' + discountValue.toString());
+      }
+
+      if (totalPriceWithoutPromos > 30000) {
+        // console.log('Общая цена:' + totalPrice1);
+        discountValue -= 3;
+        //console.log('Скидка:' + discountValue.toString());
+      }
+    }
+
+    const discountAmount = Math.round((totalPriceWithoutPromos / 100) * discountValue);
+    // console.log(totalPriceWithoutPromos);
+    // console.log(discountValue);
+    // console.log(discountAmount);
+
+    return discountAmount;
+  };
+
+  const discount = calculateDiscount(cartItemsWithoutPromos);
+  const finalPrice = totalPrice - discount;
 
   useEffect(() => {
     // Прокрутка страницы наверх при монтировании компонента
     window.scrollTo(0, 0);
   }, []);
-
-  useEffect(() => {
-    if (cartItems.length === 0) {
-      navigate(AppRoutes.Main);
-      toast.warn('Корзина пуста, переходим в каталог');
-    }
-  }, [cartItems.length, navigate]);
+  //TODO: Избавиться от этой штуки, мы можем попадать в корзину если она пуста, переход нужно делать, только
+  // useEffect(() => {
+  //   if (cartItems.length === 0) {
+  //     navigate(AppRoutes.Main);
+  //     toast.warn('Корзина пуста, переходим в каталог');
+  //   }
+  // }, [cartItems.length, navigate]);
 
   const handleRemoveCartItemButtonClick = (product?: TCamerasCard) => {
     if (product) {
@@ -48,6 +117,13 @@ const CartPage = (): JSX.Element => {
 
   const handleCrossButtonClick = () => {
     setIsModalActive(false);
+  };
+  //TODO: Доработать, нужно показывать модальное окно по нажатию,а не просто отправлять запрос на сервер
+  const handlePostOrder = () => {
+    dispatch(postOrder({
+      camerasIds: [...cartItemsIds],
+      coupon: null,
+    }));
   };
 
   return (
@@ -83,6 +159,7 @@ const CartPage = (): JSX.Element => {
         <section className="basket">
           <div className="container">
             <h1 className="title title--h2">Корзина</h1>
+            {cartItems.length === 0 && <EmptyProducts />}
             <ul className="basket__list">
               {cartCards.map((card) => <CartItem key={card.id} product={card} onCartItemRemoveButtonClick={handleRemoveCartItemButtonClick} />)}
             </ul>
@@ -110,8 +187,8 @@ const CartPage = (): JSX.Element => {
                 </p>
                 <p className="basket__summary-item">
                   <span className="basket__summary-text">Скидка:</span>
-                  <span className="basket__summary-value basket__summary-value--bonus">
-                    0 ₽
+                  <span className={`basket__summary-value ${discount > 0 ? 'basket__summary-value--bonus' : ''}`}>
+                    {calculateDiscount(cartItemsWithoutPromos).toLocaleString('ru-RU')} ₽
                   </span>
                 </p>
                 <p className="basket__summary-item">
@@ -119,10 +196,15 @@ const CartPage = (): JSX.Element => {
                     К оплате:
                   </span>
                   <span className="basket__summary-value basket__summary-value--total">
-                    111 390 ₽
+                    {finalPrice.toLocaleString('ru-RU')} ₽
                   </span>
                 </p>
-                <button className="btn btn--purple" type="submit">
+                <button
+                  className="btn btn--purple"
+                  type="submit"
+                  onClick={handlePostOrder}
+                  disabled={cartItems.length === 0}
+                >
                   Оформить заказ
                 </button>
               </div>

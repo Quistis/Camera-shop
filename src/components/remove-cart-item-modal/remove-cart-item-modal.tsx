@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import FocusTrap from 'focus-trap-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { selectCartItems, removeProductFromCart } from '../../store/slices/cart';
 import { saveCartState } from '../../utils/cartLocalStorage';
@@ -19,6 +20,7 @@ type AddToCartModalProps = {
 const RemoveCartItemModal = ({product, isModalActive, onCrossButtonClick}: AddToCartModalProps): JSX.Element => {
 
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const cartItems = useAppSelector(selectCartItems);
 
   const [isFocusTrapActive, setIsFocusTrapActive] = useState(false);
@@ -80,7 +82,12 @@ const RemoveCartItemModal = ({product, isModalActive, onCrossButtonClick}: AddTo
 
     if (onCrossButtonClick) {
       onCrossButtonClick();
+      if (cartItems.length === 1) {
+        navigate(AppRoutes.Main);
+        toast.warn('Корзина пуста, переходим в каталог');
+      }
     }
+
   };
 
   return (

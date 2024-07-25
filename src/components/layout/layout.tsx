@@ -6,6 +6,7 @@ import SearchForm from '../search-form/search-form';
 
 const Layout = (): JSX.Element => {
   const cartItems = useAppSelector(selectCartItems);
+  const totalQuantity = cartItems.reduce((accumulator, item) => accumulator + item.quantity, 0);
 
   return (
     <div className="wrapper">
@@ -50,7 +51,7 @@ const Layout = (): JSX.Element => {
               <use xlinkHref="#icon-basket" />
             </svg>
             {cartItems.length !== 0 &&
-            <span className="header__basket-count">{cartItems.length}</span>}
+            <span className="header__basket-count">{totalQuantity}</span>}
 
           </Link>
         </div>
