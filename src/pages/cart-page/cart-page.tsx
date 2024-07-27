@@ -1,25 +1,90 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import CartItem from '../../components/cart-item/cart-item';
 import RemoveCartItemModal from '../../components/remove-cart-item-modal/remove-cart-item-modal';
+import PostOrderModal from '../../components/post-order-modal/post-order-modal';
 import EmptyProducts from '../../components/empty-products/empty-products';
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import { selectCameraCards } from '../../store/slices/cameras';
 import { selectPromosData } from '../../store/slices/promos';
-import { selectCartItems } from '../../store/slices/cart';
+import { selectCartItems, setCartProducts } from '../../store/slices/cart';
 import { postOrder } from '../../store/api-actions';
 import { AppRoutes } from '../../const';
 import { TCamerasCard } from '../../types/cameras';
 import { TCartItem } from '../../store/slices/cart';
 
+const calculateDiscount = (products: TCartItem[]): number => {
+
+  let discountValue = 0;
+
+  const totalQuantity = products.reduce((accumulator, currentValue) => accumulator + currentValue.quantity, 0);
+  const totalPriceWithoutPromos = products.reduce((total, item) => total + item.price * item.quantity, 0);
+
+  if (totalQuantity === 2) {
+    // console.log('Общее количество:' + totalQuantity);
+    discountValue = 3;
+    // console.log('Скидка:' + discountValue.toString());
+  }
+
+  if (totalQuantity >= 3 && totalQuantity <= 5) {
+    // console.log('Общее количество:' + totalQuantity);
+    discountValue = 5;
+    // console.log('Скидка:' + discountValue.toString());
+  }
+
+  if (totalQuantity >= 6 && totalQuantity <= 10) {
+    // console.log('Общее количество:' + totalQuantity);
+    discountValue = 10;
+    // console.log('Скидка:' + discountValue.toString());
+  }
+
+  if (totalQuantity > 10) {
+    // console.log('Общее количество:' + totalQuantity);
+    discountValue = 15;
+    // console.log('Скидка:' + discountValue.toString());
+  }
+
+  if (totalQuantity > 1) {
+    if (totalPriceWithoutPromos >= 10000 && totalPriceWithoutPromos < 20000) {
+      // console.log('Общая цена:' + totalPrice1);
+      discountValue -= 1;
+      // console.log('Скидка:' + discountValue.toString());
+    }
+
+    if (totalPriceWithoutPromos >= 20000 && totalPriceWithoutPromos < 30000) {
+      // console.log('Общая цена:' + totalPrice1);
+      discountValue -= 2;
+      // console.log('Скидка:' + discountValue.toString());
+    }
+
+    if (totalPriceWithoutPromos > 30000) {
+      // console.log('Общая цена:' + totalPrice1);
+      discountValue -= 3;
+      //console.log('Скидка:' + discountValue.toString());
+    }
+  }
+
+  const discountAmount = Math.round((totalPriceWithoutPromos / 100) * discountValue);
+  // console.log(totalPriceWithoutPromos);
+  // console.log(discountValue);
+  // console.log(discountAmount);
+
+  return discountAmount;
+};
+
 //TODO: Изменения тут для подсчета кол-ва,цены и тд, тут в переменной cartCards тот же самый тип что и TCamerasCard, только есть поле quantity, надо сделать под него тип
 const CartPage = (): JSX.Element => {
+
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const cardsData = useAppSelector(selectCameraCards);
   const cartItems = useAppSelector(selectCartItems);
   const promoItems = useAppSelector(selectPromosData);
 
   const [activeProduct, setActiveProduct] = useState<TCamerasCard | null>(null);
   const [isModalActive, setIsModalActive] = useState(false);
+  const [isPostOrderModalActive, setIsPostOrderModalActive] = useState(false);
 
   const cartCards = cardsData.filter((card) =>
     cartItems.some((item) => item.id === card.id)
@@ -33,65 +98,6 @@ const CartPage = (): JSX.Element => {
   const cartItemsIds = cartItems.map((items) => items.id);
   const promoItemsIds = promoItems.map((item) => item.id);
   const cartItemsWithoutPromos = cartItems.filter((item) => !promoItemsIds.some((promoId) => promoId === item.id));
-
-  const calculateDiscount = (products: TCartItem[]): number => {
-
-    let discountValue = 0;
-
-    const totalQuantity = products.reduce((accumulator, currentValue) => accumulator + currentValue.quantity, 0);
-    const totalPriceWithoutPromos = products.reduce((total, item) => total + item.price * item.quantity, 0);
-
-    if (totalQuantity === 2) {
-      // console.log('Общее количество:' + totalQuantity);
-      discountValue = 3;
-      // console.log('Скидка:' + discountValue.toString());
-    }
-
-    if (totalQuantity >= 3 && totalQuantity <= 5) {
-      // console.log('Общее количество:' + totalQuantity);
-      discountValue = 5;
-      // console.log('Скидка:' + discountValue.toString());
-    }
-
-    if (totalQuantity >= 6 && totalQuantity <= 10) {
-      // console.log('Общее количество:' + totalQuantity);
-      discountValue = 10;
-      // console.log('Скидка:' + discountValue.toString());
-    }
-
-    if (totalQuantity > 10) {
-      // console.log('Общее количество:' + totalQuantity);
-      discountValue = 15;
-      // console.log('Скидка:' + discountValue.toString());
-    }
-
-    if (totalQuantity > 1) {
-      if (totalPriceWithoutPromos >= 10000 && totalPriceWithoutPromos < 20000) {
-        // console.log('Общая цена:' + totalPrice1);
-        discountValue -= 1;
-        // console.log('Скидка:' + discountValue.toString());
-      }
-
-      if (totalPriceWithoutPromos >= 20000 && totalPriceWithoutPromos < 30000) {
-        // console.log('Общая цена:' + totalPrice1);
-        discountValue -= 2;
-        // console.log('Скидка:' + discountValue.toString());
-      }
-
-      if (totalPriceWithoutPromos > 30000) {
-        // console.log('Общая цена:' + totalPrice1);
-        discountValue -= 3;
-        //console.log('Скидка:' + discountValue.toString());
-      }
-    }
-
-    const discountAmount = Math.round((totalPriceWithoutPromos / 100) * discountValue);
-    // console.log(totalPriceWithoutPromos);
-    // console.log(discountValue);
-    // console.log(discountAmount);
-
-    return discountAmount;
-  };
 
   const discount = calculateDiscount(cartItemsWithoutPromos);
   const finalPrice = totalPrice - discount;
@@ -120,10 +126,30 @@ const CartPage = (): JSX.Element => {
   };
   //TODO: Доработать, нужно показывать модальное окно по нажатию,а не просто отправлять запрос на сервер
   const handlePostOrder = () => {
+    setIsPostOrderModalActive(true);
+
     dispatch(postOrder({
       camerasIds: [...cartItemsIds],
       coupon: null,
-    }));
+    }))
+      .then((response) => {
+
+        if (response.meta.requestStatus === 'fulfilled') {
+          setTimeout(() => {
+            navigate(AppRoutes.Main);
+            dispatch(setCartProducts([]));
+            localStorage.clear();
+          }, 2000);
+
+          // dispatch(setCartProducts([]));
+          // localStorage.clear();
+        }
+      });
+
+  };
+
+  const handlePostOrderModalCrossButtonClick = () => {
+    setIsPostOrderModalActive(false);
   };
 
   return (
@@ -216,6 +242,10 @@ const CartPage = (): JSX.Element => {
         product={activeProduct}
         isModalActive={isModalActive}
         onCrossButtonClick={handleCrossButtonClick}
+      />
+      <PostOrderModal
+        isModalActive={isPostOrderModalActive}
+        onCrossButtonClick={handlePostOrderModalCrossButtonClick}
       />
     </main>
 

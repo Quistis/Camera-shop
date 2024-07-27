@@ -52,6 +52,11 @@ const CatalogPage = (): JSX.Element => {
   });
 
   useEffect(() => {
+    // Прокрутка страницы наверх при монтировании компонента
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     setSortType(initialSortType);
     setSortDirection(initialSortDirection);
     setCurrentPage(initialPaginationPage);

@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { postOrder } from '../api-actions';
 import { State } from '../../types/state';
 import { NameSpace } from '../../const';
 
@@ -11,12 +12,16 @@ export type TCartItem = {
 type CartState = {
   cart: {
     cartProducts: TCartItem[];
+    postOrderLoadingStatus: boolean;
+    postOrderErrorStatus: boolean;
   };
 };
 
 const initialState: CartState = {
   cart: {
     cartProducts: [],
+    postOrderLoadingStatus: false,
+    postOrderErrorStatus: false,
   }
 };
 
@@ -51,9 +56,26 @@ const cartSlice = createSlice({
       }
     },
   },
+  extraReducers(builder) {
+    builder
+      .addCase(postOrder.pending, (state) => {
+        state.cart.postOrderErrorStatus = false;
+        state.cart.postOrderLoadingStatus = true;
+      })
+      .addCase(postOrder.fulfilled, (state) => {
+        state.cart.postOrderLoadingStatus = false;
+      })
+      .addCase(postOrder.rejected, (state) => {
+        state.cart.postOrderErrorStatus = true;
+        state.cart.postOrderLoadingStatus = false;
+      });
+  }
 });
 
 export const selectCartItems = (state: State): TCartItem[] => state[NameSpace.Cart].cart.cartProducts;
+
+export const selectPostOrderLoadingStatus = (state: State): boolean => state[NameSpace.Cart].cart.postOrderLoadingStatus;
+export const selectPostOrderErrorStatus = (state: State): boolean => state[NameSpace.Cart].cart.postOrderErrorStatus;
 
 export const { addProductToCart, setCartProducts, updateProductQuantity, removeProductFromCart } = cartSlice.actions;
 export const cartReducer = cartSlice.reducer;
