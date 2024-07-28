@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CartItem from '../../components/cart-item/cart-item';
 import RemoveCartItemModal from '../../components/remove-cart-item-modal/remove-cart-item-modal';
@@ -8,7 +8,7 @@ import { useAppSelector, useAppDispatch } from '../../hooks';
 import { selectCameraCards } from '../../store/slices/cameras';
 import { selectPromosData } from '../../store/slices/promos';
 import { selectCartItems, setCartProducts } from '../../store/slices/cart';
-import { postOrder } from '../../store/api-actions';
+import { postOrder, postCoupon } from '../../store/api-actions';
 import { AppRoutes } from '../../const';
 import { TCamerasCard } from '../../types/cameras';
 import { TCartItem } from '../../store/slices/cart';
@@ -152,6 +152,12 @@ const CartPage = (): JSX.Element => {
     setIsPostOrderModalActive(false);
   };
 
+  //TODO: доработать обработчик отправки купона. пока что сделал его чтобы просто проверить что экшн работает корректно
+  const handlePostCouponSubmit = (evt: FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+    dispatch(postCoupon('camera-333'));
+  };
+
   return (
     <main>
       <div className="page-content">
@@ -191,20 +197,28 @@ const CartPage = (): JSX.Element => {
             </ul>
             <div className="basket__summary">
               <div className="basket__promo">
-                {/*<p class="title title&#45;&#45;h4">Если у вас есть промокод на скидку, примените его в этом поле</p>
-                <div class="basket-form">
-                  <form action="#">
-                    <div class="custom-input">
-                      <label><span class="custom-input__label">Промокод</span>
-                        <input type="text" name="promo" placeholder="Введите промокод">
+                <p className="title title--h4">
+                  Если у вас есть промокод на скидку, примените его в этом поле
+                </p>
+                <div className="basket-form">
+                  <form action="#" onSubmit={handlePostCouponSubmit}>
+                    <div className="custom-input">
+                      <label>
+                        <span className="custom-input__label">Промокод</span>
+                        <input type="text" name="promo" placeholder="Введите промокод" />
                       </label>
-                      <p class="custom-input__error">Промокод неверный</p>
-                      <p class="custom-input__success">Промокод принят!</p>
+                      <p className="custom-input__error">Промокод неверный</p>
+                      <p className="custom-input__success">Промокод принят!</p>
                     </div>
-                    <button class="btn" type="submit">Применить
+                    <button
+                      className="btn"
+                      type="submit"
+                      // onSubmit={handlePostCouponButtonClick}
+                    >
+                      Применить
                     </button>
                   </form>
-                </div>*/}
+                </div>
               </div>
               <div className="basket__summary-order">
                 <p className="basket__summary-item">

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { postOrder } from '../api-actions';
+import { postOrder, postCoupon } from '../api-actions';
 import { State } from '../../types/state';
 import { NameSpace } from '../../const';
 
@@ -15,6 +15,11 @@ type CartState = {
     postOrderLoadingStatus: boolean;
     postOrderErrorStatus: boolean;
   };
+  coupon: {
+    discount: number;
+    couponLoadingStatus: boolean;
+    couponErrorStatus: boolean;
+  };
 };
 
 const initialState: CartState = {
@@ -22,7 +27,12 @@ const initialState: CartState = {
     cartProducts: [],
     postOrderLoadingStatus: false,
     postOrderErrorStatus: false,
-  }
+  },
+  coupon: {
+    discount: 0,
+    couponLoadingStatus: false,
+    couponErrorStatus: false,
+  },
 };
 
 const cartSlice = createSlice({
@@ -68,6 +78,19 @@ const cartSlice = createSlice({
       .addCase(postOrder.rejected, (state) => {
         state.cart.postOrderErrorStatus = true;
         state.cart.postOrderLoadingStatus = false;
+      })
+
+      .addCase(postCoupon.pending, (state) => {
+        state.coupon.couponLoadingStatus = true;
+        state.coupon.couponErrorStatus = false;
+      })
+      .addCase(postCoupon.fulfilled, (state, action) => {
+        state.coupon.couponLoadingStatus = false;
+        state.coupon.discount = action.payload;
+      })
+      .addCase(postCoupon.rejected, (state) => {
+        state.coupon.couponLoadingStatus = false;
+        state.coupon.couponErrorStatus = true;
       });
   }
 });

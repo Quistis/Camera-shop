@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import FocusTrap from 'focus-trap-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -25,6 +25,8 @@ const RemoveCartItemModal = ({product, isModalActive, onCrossButtonClick}: AddTo
 
   const [isFocusTrapActive, setIsFocusTrapActive] = useState(false);
 
+  const removeItemButtonRef = useRef<HTMLButtonElement>(null);
+
   const {
     id = 0,
     vendorCode = '',
@@ -46,6 +48,12 @@ const RemoveCartItemModal = ({product, isModalActive, onCrossButtonClick}: AddTo
       setIsFocusTrapActive(false);
     }
   }, [isModalActive]);
+
+  useEffect(() => {
+    if (removeItemButtonRef.current) {
+      removeItemButtonRef.current.focus();
+    }
+  }, []);
 
   useEffect(() => {
     if (isModalActive) {
@@ -130,6 +138,7 @@ const RemoveCartItemModal = ({product, isModalActive, onCrossButtonClick}: AddTo
                 className="btn btn--purple modal__btn modal__btn--half-width"
                 type="button"
                 onClick={() => handleCartItemRemoval(id)}
+                ref={removeItemButtonRef}
               >
                 Удалить
               </button>

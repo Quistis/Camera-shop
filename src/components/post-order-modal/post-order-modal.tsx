@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FocusTrap from 'focus-trap-react';
 import { useAppSelector } from '../../hooks';
@@ -19,6 +19,9 @@ const PostOrderModal = ({isModalActive, onCrossButtonClick}: postOrderModalProps
 
   const [isFocusTrapActive, setIsFocusTrapActive] = useState(false);
 
+  const successButtonRef = useRef<HTMLButtonElement>(null);
+  const errorButtonRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     if (isModalActive) {
       setTimeout(() => {
@@ -28,6 +31,16 @@ const PostOrderModal = ({isModalActive, onCrossButtonClick}: postOrderModalProps
       setIsFocusTrapActive(false);
     }
   }, [isModalActive]);
+
+  useEffect(() => {
+    if (isLoading === false) {
+      if (isError === false && successButtonRef.current) {
+        successButtonRef.current.focus();
+      } else if (isError === true && errorButtonRef.current) {
+        errorButtonRef.current.focus();
+      }
+    }
+  }, [isLoading, isError]);
 
   useEffect(() => {
     if (isModalActive) {
@@ -77,6 +90,7 @@ const PostOrderModal = ({isModalActive, onCrossButtonClick}: postOrderModalProps
                 className="btn btn--purple modal__btn modal__btn--fit-width"
                 type="button"
                 onClick={() => navigate(AppRoutes.Main)}
+                ref={successButtonRef}
               >
                 Вернуться к покупкам
               </button>
@@ -91,6 +105,7 @@ const PostOrderModal = ({isModalActive, onCrossButtonClick}: postOrderModalProps
                 className="btn btn--purple modal__btn modal__btn--fit-width"
                 type="button"
                 onClick={handleCrossButtonClick}
+                ref={errorButtonRef}
               >
                 Вернуться в корзину
               </button>

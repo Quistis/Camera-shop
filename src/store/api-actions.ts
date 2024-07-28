@@ -86,3 +86,30 @@ export const postOrder = createAsyncThunk<void, TOrder, {
 
   }
 );
+
+export const postCoupon = createAsyncThunk<number, string, {
+  dispatch: AppDispatch;
+  state: State;
+  extra: AxiosInstance;
+}>(
+  'orders/postCoupon',
+  async (coupon, { extra: api }) => {
+    const { data } = await api.post<number>(APIRoute.Coupon, { coupon });
+    return data;
+  }
+);
+
+// export const postCoupon = createAsyncThunk<number, coupon: string, {
+//   dispatch: AppDispatch;
+//   state: State;
+//   extra: AxiosInstance;
+// }>(
+//   'orders/postCoupon',
+//   async(coupon, {extra: api}) => {
+
+//     const data = await api.post<void>(APIRoute.Order, coupon);
+
+//     return data;
+
+//   }
+// );
