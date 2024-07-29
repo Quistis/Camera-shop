@@ -1,19 +1,21 @@
-import { useEffect, useState, FormEvent } from 'react';
+import { useEffect, useState, useRef, FormEvent, ChangeEvent, FocusEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CartItem from '../../components/cart-item/cart-item';
 import RemoveCartItemModal from '../../components/remove-cart-item-modal/remove-cart-item-modal';
 import PostOrderModal from '../../components/post-order-modal/post-order-modal';
 import EmptyProducts from '../../components/empty-products/empty-products';
+import UiBlocker from '../../components/ui-blocker/ui-blocker';
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import { selectCameraCards } from '../../store/slices/cameras';
 import { selectPromosData } from '../../store/slices/promos';
-import { selectCartItems, setCartProducts } from '../../store/slices/cart';
+import { selectCartItems, selectCouponDiscount, selectCouponLoadingStatus, setCartProducts, setCouponDiscount } from '../../store/slices/cart';
 import { postOrder, postCoupon } from '../../store/api-actions';
+import { saveCouponState, loadCouponState } from '../../utils/cartLocalStorage';
 import { AppRoutes } from '../../const';
 import { TCamerasCard } from '../../types/cameras';
 import { TCartItem } from '../../store/slices/cart';
 
-const calculateDiscount = (products: TCartItem[]): number => {
+const calculateDiscount = (products: TCartItem[], couponDiscount: number): number => {
 
   let discountValue = 0;
 
@@ -21,53 +23,37 @@ const calculateDiscount = (products: TCartItem[]): number => {
   const totalPriceWithoutPromos = products.reduce((total, item) => total + item.price * item.quantity, 0);
 
   if (totalQuantity === 2) {
-    // console.log('Общее количество:' + totalQuantity);
     discountValue = 3;
-    // console.log('Скидка:' + discountValue.toString());
   }
 
   if (totalQuantity >= 3 && totalQuantity <= 5) {
-    // console.log('Общее количество:' + totalQuantity);
     discountValue = 5;
-    // console.log('Скидка:' + discountValue.toString());
   }
 
   if (totalQuantity >= 6 && totalQuantity <= 10) {
-    // console.log('Общее количество:' + totalQuantity);
     discountValue = 10;
-    // console.log('Скидка:' + discountValue.toString());
   }
 
   if (totalQuantity > 10) {
-    // console.log('Общее количество:' + totalQuantity);
     discountValue = 15;
-    // console.log('Скидка:' + discountValue.toString());
   }
 
   if (totalQuantity > 1) {
     if (totalPriceWithoutPromos >= 10000 && totalPriceWithoutPromos < 20000) {
-      // console.log('Общая цена:' + totalPrice1);
       discountValue -= 1;
-      // console.log('Скидка:' + discountValue.toString());
     }
 
     if (totalPriceWithoutPromos >= 20000 && totalPriceWithoutPromos < 30000) {
-      // console.log('Общая цена:' + totalPrice1);
       discountValue -= 2;
-      // console.log('Скидка:' + discountValue.toString());
     }
 
     if (totalPriceWithoutPromos > 30000) {
-      // console.log('Общая цена:' + totalPrice1);
       discountValue -= 3;
-      //console.log('Скидка:' + discountValue.toString());
     }
   }
 
-  const discountAmount = Math.round((totalPriceWithoutPromos / 100) * discountValue);
-  // console.log(totalPriceWithoutPromos);
-  // console.log(discountValue);
-  // console.log(discountAmount);
+  const totalDiscountPercent = totalQuantity > 1 ? discountValue + couponDiscount : discountValue;
+  const discountAmount = Math.round((totalPriceWithoutPromos / 100) * totalDiscountPercent);
 
   return discountAmount;
 };
@@ -81,10 +67,17 @@ const CartPage = (): JSX.Element => {
   const cardsData = useAppSelector(selectCameraCards);
   const cartItems = useAppSelector(selectCartItems);
   const promoItems = useAppSelector(selectPromosData);
+  const couponDiscount = useAppSelector(selectCouponDiscount);
+  const couponLoadingStatus = useAppSelector(selectCouponLoadingStatus);
 
   const [activeProduct, setActiveProduct] = useState<TCamerasCard | null>(null);
   const [isModalActive, setIsModalActive] = useState(false);
   const [isPostOrderModalActive, setIsPostOrderModalActive] = useState(false);
+  const [couponInputValue, setCouponInput] = useState('');
+  const [couponStatus, setCouponStatus] = useState<'valid' | 'invalid' | null>(null);
+
+  const postCouponButtonRef = useRef<HTMLButtonElement>(null);
+  const couponInputRef = useRef<HTMLInputElement>(null);
 
   const cartCards = cardsData.filter((card) =>
     cartItems.some((item) => item.id === card.id)
@@ -99,13 +92,39 @@ const CartPage = (): JSX.Element => {
   const promoItemsIds = promoItems.map((item) => item.id);
   const cartItemsWithoutPromos = cartItems.filter((item) => !promoItemsIds.some((promoId) => promoId === item.id));
 
-  const discount = calculateDiscount(cartItemsWithoutPromos);
-  const finalPrice = totalPrice - discount;
+  const discountAmount = calculateDiscount(cartItemsWithoutPromos, couponDiscount);
+  const finalPrice = totalPrice - discountAmount;
 
   useEffect(() => {
     // Прокрутка страницы наверх при монтировании компонента
     window.scrollTo(0, 0);
   }, []);
+
+  useEffect(() => {
+    const { couponCode, discount } = loadCouponState();
+    if (couponCode && discount) {
+      setCouponInput(couponCode);
+      setCouponStatus('valid');
+      dispatch(setCouponDiscount(discount));
+    }
+  }, [dispatch]);
+
+  // useEffect(() => {
+  //   if (couponDiscount !== 0 && postCouponButtonRef.current) {
+  //     postCouponButtonRef.current.disabled = true;
+  //   }
+
+  //   if (couponDiscount !== 0 && couponInputRef.current) {
+  //     couponInputRef.current.disabled = true;
+
+  //     const couponCode = loadCouponState().couponCode || '';
+  //     couponInputRef.current.placeholder = `Купон: ${couponCode}`;
+
+  //     setCouponInput('');
+
+  //   }
+  // }, [couponDiscount, couponInput]);
+
   //TODO: Избавиться от этой штуки, мы можем попадать в корзину если она пуста, переход нужно делать, только
   // useEffect(() => {
   //   if (cartItems.length === 0) {
@@ -138,10 +157,12 @@ const CartPage = (): JSX.Element => {
           setTimeout(() => {
             navigate(AppRoutes.Main);
             dispatch(setCartProducts([]));
+            dispatch(setCouponDiscount(0));
             localStorage.clear();
           }, 2000);
 
           // dispatch(setCartProducts([]));
+          // dispatch(setCouponDiscount(0));
           // localStorage.clear();
         }
       });
@@ -152,10 +173,42 @@ const CartPage = (): JSX.Element => {
     setIsPostOrderModalActive(false);
   };
 
+  const handleCouponCodeChange = (evt: ChangeEvent<HTMLInputElement>) => {
+    const value = evt.target.value.replace(/\s/g, '');
+    setCouponInput(value);
+    //Это мб надо будет убрать
+    setCouponStatus(null);
+  };
+
+  const handleCouponInputBlur = (evt: FocusEvent<HTMLInputElement>) => {
+    const value = evt.target.value.replace(/\s/g, '');
+    setCouponInput(value);
+    //Это мб надо будет убрать
+    setCouponStatus(null);
+  };
+
   //TODO: доработать обработчик отправки купона. пока что сделал его чтобы просто проверить что экшн работает корректно
   const handlePostCouponSubmit = (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
-    dispatch(postCoupon('camera-333'));
+    dispatch(postCoupon(couponInputValue))
+      .then((response) => {
+
+        const couponDiscountValue = response.payload as number;
+
+        if (response.meta.requestStatus === 'fulfilled') {
+          //Значение скидки по купону мб не нужно,я и так записываю его в редух
+          // const couponDiscountValue = response.payload as number; // Assuming the discount value is returned as payload
+          setCouponStatus('valid');
+          saveCouponState(couponInputValue, couponDiscountValue);
+          // dispatch(setCouponDiscount(couponDiscountValue));
+          // Additional logic to apply the discount can be added here
+        } else {
+          setCouponStatus('invalid');
+          //Пока что не уверен что нужно затирать старые данные, при вводе нового промокода
+          saveCouponState('', 0);
+          dispatch(setCouponDiscount(0));
+        }
+      });
   };
 
   return (
@@ -202,15 +255,24 @@ const CartPage = (): JSX.Element => {
                 </p>
                 <div className="basket-form">
                   <form action="#" onSubmit={handlePostCouponSubmit}>
-                    <div className="custom-input">
+                    <div className={`custom-input ${couponStatus === 'valid' ? 'is-valid' : ''} ${couponStatus === 'invalid' ? 'is-invalid' : ''}`}>
                       <label>
                         <span className="custom-input__label">Промокод</span>
-                        <input type="text" name="promo" placeholder="Введите промокод" />
+                        <input
+                          ref={couponInputRef}
+                          type="text"
+                          name="promo"
+                          value={couponInputValue}
+                          placeholder="Введите промокод"
+                          onChange={handleCouponCodeChange}
+                          onBlur={handleCouponInputBlur}
+                        />
                       </label>
                       <p className="custom-input__error">Промокод неверный</p>
                       <p className="custom-input__success">Промокод принят!</p>
                     </div>
                     <button
+                      ref={postCouponButtonRef}
                       className="btn"
                       type="submit"
                       // onSubmit={handlePostCouponButtonClick}
@@ -227,8 +289,8 @@ const CartPage = (): JSX.Element => {
                 </p>
                 <p className="basket__summary-item">
                   <span className="basket__summary-text">Скидка:</span>
-                  <span className={`basket__summary-value ${discount > 0 ? 'basket__summary-value--bonus' : ''}`}>
-                    {calculateDiscount(cartItemsWithoutPromos).toLocaleString('ru-RU')} ₽
+                  <span className={`basket__summary-value ${discountAmount > 0 ? 'basket__summary-value--bonus' : ''}`}>
+                    {discountAmount.toLocaleString('ru-RU')} ₽
                   </span>
                 </p>
                 <p className="basket__summary-item">
@@ -261,6 +323,7 @@ const CartPage = (): JSX.Element => {
         isModalActive={isPostOrderModalActive}
         onCrossButtonClick={handlePostOrderModalCrossButtonClick}
       />
+      <UiBlocker isActive={couponLoadingStatus}/>
     </main>
 
   );

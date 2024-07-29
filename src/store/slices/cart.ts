@@ -56,6 +56,9 @@ const cartSlice = createSlice({
     setCartProducts: (state, action: PayloadAction<TCartItem[]>) => {
       state.cart.cartProducts = action.payload;
     },
+    setCouponDiscount: (state, action: PayloadAction<number>) => {
+      state.coupon.discount = action.payload;
+    },
     removeProductFromCart: (state, action: PayloadAction<number>) => {
       state.cart.cartProducts = state.cart.cartProducts.filter((item) => item.id !== action.payload);
     },
@@ -96,9 +99,12 @@ const cartSlice = createSlice({
 });
 
 export const selectCartItems = (state: State): TCartItem[] => state[NameSpace.Cart].cart.cartProducts;
+export const selectCouponDiscount = (state: State): number => state[NameSpace.Cart].coupon.discount;
 
 export const selectPostOrderLoadingStatus = (state: State): boolean => state[NameSpace.Cart].cart.postOrderLoadingStatus;
 export const selectPostOrderErrorStatus = (state: State): boolean => state[NameSpace.Cart].cart.postOrderErrorStatus;
 
-export const { addProductToCart, setCartProducts, updateProductQuantity, removeProductFromCart } = cartSlice.actions;
+export const selectCouponLoadingStatus = (state: State): boolean => state[NameSpace.Cart].coupon.couponLoadingStatus;
+
+export const { addProductToCart, setCartProducts, setCouponDiscount, updateProductQuantity, removeProductFromCart } = cartSlice.actions;
 export const cartReducer = cartSlice.reducer;

@@ -3,8 +3,8 @@ import FocusTrap from 'focus-trap-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { selectCartItems, removeProductFromCart } from '../../store/slices/cart';
-import { saveCartState } from '../../utils/cartLocalStorage';
+import { selectCartItems, removeProductFromCart, setCouponDiscount } from '../../store/slices/cart';
+import { saveCartState, saveCouponState } from '../../utils/cartLocalStorage';
 import { TCamerasCard } from '../../types/cameras';
 import { generateDescription } from '../../utils/utils';
 import { AppRoutes } from '../../const';
@@ -91,6 +91,8 @@ const RemoveCartItemModal = ({product, isModalActive, onCrossButtonClick}: AddTo
     if (onCrossButtonClick) {
       onCrossButtonClick();
       if (cartItems.length === 1) {
+        saveCouponState('', 0);
+        dispatch(setCouponDiscount(0));
         navigate(AppRoutes.Main);
         toast.warn('Корзина пуста, переходим в каталог');
       }
