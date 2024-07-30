@@ -11,6 +11,7 @@ import ReviewsList from '../../components/reviews-list/reviews-list';
 import NotFoundPage from '../not-found-page/not-found-page';
 import AddToCartModal from '../../components/add-to-cart-modal/add-to-cart-modal';
 import AddToCartSuccessModal from '../../components/add-to-cart-success-modal/add-to-cart-success-modal';
+import ReviewModal from '../../components/review-modal/review-modal';
 import ScrollToTopButton from '../../components/scroll-to-top-button/scroll-to-top-button';
 import Loader from '../../components/loader/loader';
 import { TCamerasCard } from '../../types/cameras';
@@ -24,6 +25,7 @@ const ProductPage = (): JSX.Element => {
   const [activeProduct, setActiveProduct] = useState<TCamerasCard | null>(null);
   const [isModalActive, setIsModalActive] = useState(false);
   const [isSuccessModalActive, setIsSuccessModalActive] = useState(false);
+  const [isPostReviewModalActive, setIsPostReviewModalActive] = useState(false);
 
   const currentProduct = useAppSelector(selectCurrentProduct);
   const similarProducts = useAppSelector(selectSimilarProducts);
@@ -102,6 +104,14 @@ const ProductPage = (): JSX.Element => {
 
   const handleCloseSuccessModalCrossButtonClick = () => {
     setIsSuccessModalActive(false);
+  };
+
+  const handlePostReviewButtonClick = () => {
+    setIsPostReviewModalActive(true);
+  };
+
+  const handlePostReviewCrossButtonClick = () => {
+    setIsPostReviewModalActive(false);
   };
 
   return (
@@ -247,6 +257,13 @@ const ProductPage = (): JSX.Element => {
               <div className="container">
                 <div className="page-content__headed">
                   <h2 className="title title--h3">Отзывы</h2>
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={handlePostReviewButtonClick}
+                  >
+                    Оставить свой отзыв
+                  </button>
                 </div>
                 <ReviewsList reviews={slicedReviewsData} />
                 {!allReviewsLoaded &&
@@ -275,6 +292,10 @@ const ProductPage = (): JSX.Element => {
       <AddToCartSuccessModal
         isModalActive={isSuccessModalActive}
         onCrossButtonClick={handleCloseSuccessModalCrossButtonClick}
+      />
+      <ReviewModal
+        isActive={isPostReviewModalActive}
+        onCrossButtonClick={handlePostReviewCrossButtonClick}
       />
     </>
   );

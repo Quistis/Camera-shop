@@ -9,6 +9,7 @@ export enum APIRoute {
   Order = '/orders',
   Promo = '/promo',
   Coupon = '/coupons',
+  Reviews = '/reviews',
 }
 
 export enum NameSpace {

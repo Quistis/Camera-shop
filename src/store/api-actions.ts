@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AxiosInstance } from 'axios';
+// import { toast } from 'react-toastify';
 import { AppDispatch, State } from '../types/state';
 import { TCamerasCard } from '../types/cameras';
 import { TReview } from '../types/reviews';
@@ -11,6 +12,8 @@ type TOrder = {
   // tel: string;
   coupon: string | null;
 };
+
+type TReviewWithoutId = Omit<TReview, 'id' | 'createAt'>;
 
 export const fetchCameras = createAsyncThunk<TCamerasCard[], undefined, {
   dispatch: AppDispatch;
@@ -58,6 +61,23 @@ export const fetchReviewsById = createAsyncThunk<TReview[], string, {
   async (id, {extra: api}) => {
     const {data} = await api.get<TReview[]>(`${APIRoute.Cameras}/${id}/reviews`);
     return data;
+  }
+);
+
+export const postReview = createAsyncThunk<TReview, TReviewWithoutId, {
+  dispatch: AppDispatch;
+  state: State;
+  extra: AxiosInstance;
+}>(
+  'reviews/postReview',
+  async (formData, {extra: api}) => {
+    // try {
+    const {data} = await api.post<TReview>(APIRoute.Reviews, formData);
+    return data;
+    // } catch (error) {
+    //   toast.warn('Произошла ошибка при отправке комментария');
+    //   throw error;
+    // }
   }
 );
 

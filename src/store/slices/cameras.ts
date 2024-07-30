@@ -1,7 +1,8 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TCamerasCard } from '../../types/cameras';
+import { TReview } from '../../types/reviews';
 import { State } from '../../types/state';
-import { fetchCameras, fetchCameraById, fetchSimilarProductsById } from '../api-actions';
+import { fetchCameras, fetchCameraById, fetchSimilarProductsById, postReview } from '../api-actions';
 import { NameSpace } from '../../const';
 
 type CamerasSliceType = {
@@ -83,6 +84,19 @@ export const CamerasSlice = createSlice({
       .addCase(fetchSimilarProductsById.rejected, (state) => {
         state.similarProducts.loadingStatus = false;
         state.similarProducts.errorStatus = true;
+      })
+
+      .addCase(postReview.fulfilled, (state, action: PayloadAction<TReview>) => {
+        // Обновляем reviewsCount и добавляем отзыв в массив отзывов текущего продукта
+        if (state.currentProduct.data && state.currentProduct.data.id === action.payload.cameraId) {
+          state.currentProduct.data.reviewCount += 1;
+        }
+
+        const product = state.cards.cardsData.find((card) => card.id === action.payload.cameraId);
+
+        if (product) {
+          product.reviewCount += 1;
+        }
       });
   }
 });

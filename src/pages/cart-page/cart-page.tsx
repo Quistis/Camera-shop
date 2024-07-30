@@ -5,9 +5,10 @@ import RemoveCartItemModal from '../../components/remove-cart-item-modal/remove-
 import PostOrderModal from '../../components/post-order-modal/post-order-modal';
 import EmptyProducts from '../../components/empty-products/empty-products';
 import UiBlocker from '../../components/ui-blocker/ui-blocker';
+import Loader from '../../components/loader/loader';
 import { useAppSelector, useAppDispatch } from '../../hooks';
-import { selectCameraCards } from '../../store/slices/cameras';
-import { selectPromosData } from '../../store/slices/promos';
+import { selectCameraCards, selectCardsLoadingStatus } from '../../store/slices/cameras';
+import { selectPromosData, selectPromosLoadingStatus } from '../../store/slices/promos';
 import { selectCartItems, selectCouponDiscount, selectCouponLoadingStatus, setCartProducts, setCouponDiscount } from '../../store/slices/cart';
 import { postOrder, postCoupon } from '../../store/api-actions';
 import { saveCouponState, loadCouponState } from '../../utils/cartLocalStorage';
@@ -65,8 +66,10 @@ const CartPage = (): JSX.Element => {
   const navigate = useNavigate();
 
   const cardsData = useAppSelector(selectCameraCards);
+  const isCardsDataLoading = useAppSelector(selectCardsLoadingStatus);
   const cartItems = useAppSelector(selectCartItems);
   const promoItems = useAppSelector(selectPromosData);
+  const isPromosLoading = useAppSelector(selectPromosLoadingStatus);
   const couponDiscount = useAppSelector(selectCouponDiscount);
   const couponLoadingStatus = useAppSelector(selectCouponLoadingStatus);
 
@@ -210,6 +213,10 @@ const CartPage = (): JSX.Element => {
         }
       });
   };
+
+  if (isCardsDataLoading || isPromosLoading) {
+    return <Loader/>;
+  }
 
   return (
     <main>
