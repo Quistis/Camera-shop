@@ -8,7 +8,7 @@ const EmptyProducts = (): JSX.Element => {
 
   return (
     <div className='empty-products-wrapper'>
-      <h2 className="empty-products">🥺👉👈{cardsErrorStatus || currentProductErrorStatus ? 'Ошибка получения данных сервера' : 'Тут пока ничего нет'}👉👈🥺</h2>
+      <h2 className="empty-products">🥺👉👈{cardsErrorStatus || currentProductErrorStatus ? 'Ошибка получения данных с сервера' : 'Тут пока ничего нет'}👉👈🥺</h2>
     </div>
   );
 };

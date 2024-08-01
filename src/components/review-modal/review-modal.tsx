@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import FocusTrap from 'focus-trap-react';
 import { useAppSelector } from '../../hooks';
 import { selectPostReviewLoadingStatus, selectPostReviewErrorStatus } from '../../store/slices/reviews';
@@ -19,6 +19,7 @@ const ReviewModal = ({isActive, onCrossButtonClick}: ReviewModalProps): JSX.Elem
 
   const successButtonRef = useRef<HTMLButtonElement>(null);
   const errorButtonRef = useRef<HTMLButtonElement>(null);
+  const reviewFormRef = useRef<{ resetForm: () => void }>(null);
 
   useEffect(() => {
     if (isActive) {
@@ -48,6 +49,28 @@ const ReviewModal = ({isActive, onCrossButtonClick}: ReviewModalProps): JSX.Elem
     }
   }, [isLoading, isError, isReviewFormShown]);
 
+  const handleEscKeyDown = useCallback((evt: KeyboardEvent) => {
+    if (evt.key === 'Escape' && isActive && onCrossButtonClick && isLoading === false) {
+      onCrossButtonClick();
+
+      setTimeout(() => {
+        setIsReviewFromShown(true);
+
+        if (reviewFormRef.current) {
+          reviewFormRef.current.resetForm(); // Вызов метода resetForm
+        }
+      }, 400);
+    }
+  }, [isActive, onCrossButtonClick, isLoading]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleEscKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleEscKeyDown);
+    };
+  }, [isActive, onCrossButtonClick, handleEscKeyDown]);
+
   const handleCrossButtonClick = () => {
 
     if (onCrossButtonClick && isLoading === false) {
@@ -56,6 +79,10 @@ const ReviewModal = ({isActive, onCrossButtonClick}: ReviewModalProps): JSX.Elem
 
       setTimeout(() => {
         setIsReviewFromShown(true);
+
+        if (reviewFormRef.current) {
+          reviewFormRef.current.resetForm(); // Вызов метода resetForm
+        }
       }, 400);
 
     }
@@ -80,6 +107,7 @@ const ReviewModal = ({isActive, onCrossButtonClick}: ReviewModalProps): JSX.Elem
               onSubmitButtonClick={handleReviewFormSubmitButtonClick}
               focusOnName={isActive}
               isHidden={isReviewFormShown}
+              ref={reviewFormRef}
             />
 
             {isLoading === false && isError === false && !isReviewFormShown &&

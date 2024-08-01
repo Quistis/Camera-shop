@@ -1,8 +1,9 @@
-import { Fragment, useEffect } from 'react';
+import { Fragment, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { useForm, SubmitHandler, FieldValues, useWatch } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { postReview } from '../../store/api-actions';
 import { selectCurrentProduct } from '../../store/slices/cameras';
+import { selectPostReviewLoadingStatus } from '../../store/slices/reviews';
 import './review-form.css';
 
 const RATINGS = [5, 4, 3, 2, 1];
@@ -21,10 +22,15 @@ type ReviewFormProps = {
   isHidden?: boolean;
 };
 
-const ReviewForm = ({onSubmitButtonClick, focusOnName, isHidden}: ReviewFormProps): JSX.Element => {
+const ReviewForm = forwardRef(({
+  onSubmitButtonClick,
+  focusOnName,
+  isHidden
+}: ReviewFormProps, ref): JSX.Element => {
 
   const dispatch = useAppDispatch();
   const currentProduct = useAppSelector(selectCurrentProduct);
+  const reviewLoadingStatus = useAppSelector(selectPostReviewLoadingStatus);
 
   const { register, handleSubmit, formState: { errors }, reset, control, setFocus } = useForm<FormData>();
   const ratingValue = useWatch({ control, name: 'rating', defaultValue: 0 });
@@ -36,6 +42,12 @@ const ReviewForm = ({onSubmitButtonClick, focusOnName, isHidden}: ReviewFormProp
       }, 100); // Задержка в 100 мс, чтобы дать время компоненту отобразиться
     }
   }, [focusOnName, setFocus, isHidden]);
+
+  useImperativeHandle(ref, () => ({
+    resetForm: () => {
+      reset();
+    }
+  }));
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
 
@@ -185,14 +197,14 @@ const ReviewForm = ({onSubmitButtonClick, focusOnName, isHidden}: ReviewFormProp
             {errors.review && <div className="custom-textarea__error">{errors.review.message}</div>}
           </div>
         </div>
-        <button className="btn btn--purple form-review__btn" type="submit" >
+        <button className="btn btn--purple form-review__btn" type="submit" disabled={reviewLoadingStatus}>
           Отправить отзыв
         </button>
       </form>
     </div>
   );
 // });
-};
+});
 
 ReviewForm.displayName = 'ReviewForm';
 

@@ -7,7 +7,7 @@ import EmptyProducts from '../../components/empty-products/empty-products';
 import UiBlocker from '../../components/ui-blocker/ui-blocker';
 import Loader from '../../components/loader/loader';
 import { useAppSelector, useAppDispatch } from '../../hooks';
-import { selectCameraCards, selectCardsLoadingStatus } from '../../store/slices/cameras';
+import { selectCameraCards, selectCardsLoadingStatus, selectCardsErrorStatus } from '../../store/slices/cameras';
 import { selectPromosData, selectPromosLoadingStatus } from '../../store/slices/promos';
 import { selectCartItems, selectCouponDiscount, selectCouponLoadingStatus, setCartProducts, setCouponDiscount } from '../../store/slices/cart';
 import { postOrder, postCoupon } from '../../store/api-actions';
@@ -16,7 +16,7 @@ import { AppRoutes } from '../../const';
 import { TCamerasCard } from '../../types/cameras';
 import { TCartItem } from '../../store/slices/cart';
 
-const calculateDiscount = (products: TCartItem[], couponDiscount: number): number => {
+const calculateDiscount = (products: TCartItem[]): number => {
 
   let discountValue = 0;
 
@@ -53,8 +53,7 @@ const calculateDiscount = (products: TCartItem[], couponDiscount: number): numbe
     }
   }
 
-  const totalDiscountPercent = totalQuantity > 1 ? discountValue + couponDiscount : discountValue;
-  const discountAmount = Math.round((totalPriceWithoutPromos / 100) * totalDiscountPercent);
+  const discountAmount = Math.round((totalPriceWithoutPromos / 100) * discountValue);
 
   return discountAmount;
 };
@@ -67,6 +66,7 @@ const CartPage = (): JSX.Element => {
 
   const cardsData = useAppSelector(selectCameraCards);
   const isCardsDataLoading = useAppSelector(selectCardsLoadingStatus);
+  const cardsErrorStatus = useAppSelector(selectCardsErrorStatus);
   const cartItems = useAppSelector(selectCartItems);
   const promoItems = useAppSelector(selectPromosData);
   const isPromosLoading = useAppSelector(selectPromosLoadingStatus);
@@ -95,8 +95,11 @@ const CartPage = (): JSX.Element => {
   const promoItemsIds = promoItems.map((item) => item.id);
   const cartItemsWithoutPromos = cartItems.filter((item) => !promoItemsIds.some((promoId) => promoId === item.id));
 
-  const discountAmount = calculateDiscount(cartItemsWithoutPromos, couponDiscount);
-  const finalPrice = totalPrice - discountAmount;
+  const discountAmount = calculateDiscount(cartItemsWithoutPromos);
+  const couponDiscountAmount = Math.round((totalPrice / 100) * couponDiscount);
+  const finalDiscountAmount = discountAmount + couponDiscountAmount;
+  const finalPrice = totalPrice - finalDiscountAmount;
+  // const finalPrice = totalPrice - discountAmount;
 
   useEffect(() => {
     // Прокрутка страницы наверх при монтировании компонента
@@ -105,12 +108,12 @@ const CartPage = (): JSX.Element => {
 
   useEffect(() => {
     const { couponCode, discount } = loadCouponState();
-    if (couponCode && discount) {
+    if (couponCode && discount && cardsErrorStatus === false) {
       setCouponInput(couponCode);
       setCouponStatus('valid');
       dispatch(setCouponDiscount(discount));
     }
-  }, [dispatch]);
+  }, [dispatch, cardsErrorStatus]);
 
   // useEffect(() => {
   //   if (couponDiscount !== 0 && postCouponButtonRef.current) {
@@ -296,8 +299,8 @@ const CartPage = (): JSX.Element => {
                 </p>
                 <p className="basket__summary-item">
                   <span className="basket__summary-text">Скидка:</span>
-                  <span className={`basket__summary-value ${discountAmount > 0 ? 'basket__summary-value--bonus' : ''}`}>
-                    {discountAmount.toLocaleString('ru-RU')} ₽
+                  <span className={`basket__summary-value ${finalDiscountAmount > 0 ? 'basket__summary-value--bonus' : ''}`}>
+                    {finalDiscountAmount.toLocaleString('ru-RU')} ₽
                   </span>
                 </p>
                 <p className="basket__summary-item">

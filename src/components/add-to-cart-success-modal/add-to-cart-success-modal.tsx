@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useState, useRef, MouseEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import FocusTrap from 'focus-trap-react';
 import { AppRoutes } from '../../const';
 
@@ -11,7 +11,7 @@ type AddToCartSuccessModalProps = {
 const AddToCartSuccessModal = ({isModalActive, onCrossButtonClick}: AddToCartSuccessModalProps): JSX.Element => {
 
   const navigate = useNavigate();
-  // const location = useLocation();
+  const location = useLocation();
 
   const [isFocusTrapActive, setIsFocusTrapActive] = useState(false);
   const continueShoppingButtonRef = useRef<HTMLAnchorElement>(null);
@@ -67,6 +67,16 @@ const AddToCartSuccessModal = ({isModalActive, onCrossButtonClick}: AddToCartSuc
     }
   };
 
+  const handleContinueShoppingButtonClick = (evt: MouseEvent) => {
+    evt.preventDefault();
+
+    if (location.pathname !== '/') {
+      navigate(AppRoutes.Main);
+    } else if (onCrossButtonClick) {
+      onCrossButtonClick();
+    }
+  };
+
   const handleGoToCartButtonClick = (): void => {
     navigate(AppRoutes.Cart);
   };
@@ -84,8 +94,8 @@ const AddToCartSuccessModal = ({isModalActive, onCrossButtonClick}: AddToCartSuc
             <div className="modal__buttons">
               <a
                 className="btn btn--transparent modal__btn"
-                href="#"
-                onClick={() => navigate(AppRoutes.Main)}
+                // href="#"
+                onClick={handleContinueShoppingButtonClick}
                 ref={continueShoppingButtonRef}
               >
                 Продолжить покупки
