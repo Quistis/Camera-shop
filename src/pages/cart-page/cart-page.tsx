@@ -151,11 +151,13 @@ const CartPage = (): JSX.Element => {
   };
   //TODO: Доработать, нужно показывать модальное окно по нажатию,а не просто отправлять запрос на сервер
   const handlePostOrder = () => {
+
+    const couponCode = localStorage.getItem('couponCode') ? localStorage.getItem('couponCode') : null;
     setIsPostOrderModalActive(true);
 
     dispatch(postOrder({
       camerasIds: [...cartItemsIds],
-      coupon: null,
+      coupon: couponCode,
     }))
       .then((response) => {
 
