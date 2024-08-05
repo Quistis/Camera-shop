@@ -1,8 +1,12 @@
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
+import { useAppSelector } from '../../hooks';
+import { selectCartItems } from '../../store/slices/cart';
 import StarRating from '../star-rating/star-rating';
 import { TCamerasCard } from '../../types/cameras';
+import { AppRoutes } from '../../const';
 import './product-card.css';
+
 
 type ProductCardsProps = {
   card: TCamerasCard;
@@ -12,7 +16,10 @@ type ProductCardsProps = {
 };
 
 const ProductCard = memo(({card, onClick, isActive, className}: ProductCardsProps): JSX.Element => {
+
+  const cartItems = useAppSelector(selectCartItems);
   const {id, name, category, price, rating, reviewCount, previewImg, previewImg2x, previewImgWebp, previewImgWebp2x} = card;
+  const isCurrentProductInCart = cartItems.some((item) => item.id === id);
 
   const handleProductCardButtonClick = () => {
     if (onClick) {
@@ -47,13 +54,28 @@ const ProductCard = memo(({card, onClick, isActive, className}: ProductCardsProp
         </p>
       </div>
       <div className="product-card__buttons">
-        <button
+        {isCurrentProductInCart ?
+          <Link className="btn btn--purple-border" to={AppRoutes.Cart}>
+            <svg width={16} height={16} aria-hidden="true">
+              <use xlinkHref="#icon-basket" />
+            </svg>
+            В корзине
+          </Link>
+          :
+          <button
+            className="btn btn--purple product-card__btn"
+            type="button"
+            onClick={handleProductCardButtonClick}
+          >
+            Купить
+          </button>}
+        {/* <button
           className="btn btn--purple product-card__btn"
           type="button"
           onClick={handleProductCardButtonClick}
         >
           Купить
-        </button>
+        </button> */}
         <Link className="btn btn--transparent" to={`/camera/${id}`}>
           Подробнее
         </Link>

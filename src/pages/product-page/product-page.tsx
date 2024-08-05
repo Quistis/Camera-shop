@@ -9,7 +9,9 @@ import StarRating from '../../components/star-rating/star-rating';
 import ProductsSlider from '../../components/products-slider/products-slider';
 import ReviewsList from '../../components/reviews-list/reviews-list';
 import NotFoundPage from '../not-found-page/not-found-page';
-import CallMeModal from '../../components/call-me-modal/call-me-modal';
+import AddToCartModal from '../../components/add-to-cart-modal/add-to-cart-modal';
+import AddToCartSuccessModal from '../../components/add-to-cart-success-modal/add-to-cart-success-modal';
+import ReviewModal from '../../components/review-modal/review-modal';
 import ScrollToTopButton from '../../components/scroll-to-top-button/scroll-to-top-button';
 import Loader from '../../components/loader/loader';
 import { TCamerasCard } from '../../types/cameras';
@@ -22,6 +24,8 @@ const ProductPage = (): JSX.Element => {
   const [visibleReviewsCount, setVisibleReviewsCount] = useState(3);
   const [activeProduct, setActiveProduct] = useState<TCamerasCard | null>(null);
   const [isModalActive, setIsModalActive] = useState(false);
+  const [isSuccessModalActive, setIsSuccessModalActive] = useState(false);
+  const [isPostReviewModalActive, setIsPostReviewModalActive] = useState(false);
 
   const currentProduct = useAppSelector(selectCurrentProduct);
   const similarProducts = useAppSelector(selectSimilarProducts);
@@ -93,6 +97,23 @@ const ProductPage = (): JSX.Element => {
     setIsModalActive(false);
   };
 
+  const handleAddToCartButtonClick = () => {
+    setIsModalActive(false);
+    setIsSuccessModalActive(true);
+  };
+
+  const handleCloseSuccessModalCrossButtonClick = () => {
+    setIsSuccessModalActive(false);
+  };
+
+  const handlePostReviewButtonClick = () => {
+    setIsPostReviewModalActive(true);
+  };
+
+  const handlePostReviewCrossButtonClick = () => {
+    setIsPostReviewModalActive(false);
+  };
+
   return (
     <>
       <main>
@@ -156,7 +177,11 @@ const ProductPage = (): JSX.Element => {
                     <span className="visually-hidden">Цена:</span>{price.toLocaleString('ru-RU')} ₽
                   </p>
 
-                  <button className="btn btn--purple" type="button">
+                  <button
+                    className="btn btn--purple"
+                    type="button"
+                    onClick={() => handleProductCardBuyButtonClick(currentProduct)}
+                  >
                     <svg width={24} height={16} aria-hidden="true">
                       <use xlinkHref="#icon-add-basket" />
                     </svg>
@@ -232,6 +257,13 @@ const ProductPage = (): JSX.Element => {
               <div className="container">
                 <div className="page-content__headed">
                   <h2 className="title title--h3">Отзывы</h2>
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={handlePostReviewButtonClick}
+                  >
+                    Оставить свой отзыв
+                  </button>
                 </div>
                 <ReviewsList reviews={slicedReviewsData} />
                 {!allReviewsLoaded &&
@@ -251,10 +283,19 @@ const ProductPage = (): JSX.Element => {
         </div>
       </main>
       <ScrollToTopButton/>
-      <CallMeModal
+      <AddToCartModal
         product={activeProduct}
         isModalActive={isModalActive}
         onCrossButtonClick={handleCrossButtonClick}
+        onAddProductButtonClick={handleAddToCartButtonClick}
+      />
+      <AddToCartSuccessModal
+        isModalActive={isSuccessModalActive}
+        onCrossButtonClick={handleCloseSuccessModalCrossButtonClick}
+      />
+      <ReviewModal
+        isActive={isPostReviewModalActive}
+        onCrossButtonClick={handlePostReviewCrossButtonClick}
       />
     </>
   );

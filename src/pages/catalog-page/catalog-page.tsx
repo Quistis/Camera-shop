@@ -9,7 +9,8 @@ import ProductsList from '../../components/products-list/products-list';
 import FilterForm from '../../components/filter-form/filter-form';
 import Sorting from '../../components/sorting/sorting';
 import PaginationList from '../../components/pagination-list/pagination-list';
-import CallMeModal from '../../components/call-me-modal/call-me-modal';
+import AddToCartModal from '../../components/add-to-cart-modal/add-to-cart-modal';
+import AddToCartSuccessModal from '../../components/add-to-cart-success-modal/add-to-cart-success-modal';
 import Loader from '../../components/loader/loader';
 import EmptyProducts from '../../components/empty-products/empty-products';
 import { TCamerasCard } from '../../types/cameras';
@@ -32,6 +33,7 @@ const CatalogPage = (): JSX.Element => {
   const isPromosLoading = useAppSelector(selectPromosLoadingStatus);
   const [activeProduct, setActiveProduct] = useState<TCamerasCard | null>(null);
   const [isModalActive, setIsModalActive] = useState(false);
+  const [isSuccessModalActive, setIsSuccessModalActive] = useState(false);
 
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const initialSortType = queryParams.get('sortType') as SortType || DEFAULT_SORT_TYPE;
@@ -48,6 +50,11 @@ const CatalogPage = (): JSX.Element => {
     priceMin: queryParams.get('priceMin') || '',
     priceMax: queryParams.get('priceMax') || '',
   });
+
+  useEffect(() => {
+    // Прокрутка страницы наверх при монтировании компонента
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     setSortType(initialSortType);
@@ -224,6 +231,15 @@ const CatalogPage = (): JSX.Element => {
     setIsModalActive(false);
   };
 
+  const handleAddToCartButtonClick = () => {
+    setIsModalActive(false);
+    setIsSuccessModalActive(true);
+  };
+
+  const handleCloseSuccessModalCrossButtonClick = () => {
+    setIsSuccessModalActive(false);
+  };
+
   return (
     <main>
       <Helmet>
@@ -295,10 +311,15 @@ const CatalogPage = (): JSX.Element => {
           </div>
         </section>
       </div>
-      <CallMeModal
+      <AddToCartModal
         product={activeProduct ? activeProduct : null}
         isModalActive={isModalActive}
         onCrossButtonClick={handleCrossButtonClick}
+        onAddProductButtonClick={handleAddToCartButtonClick}
+      />
+      <AddToCartSuccessModal
+        isModalActive={isSuccessModalActive}
+        onCrossButtonClick={handleCloseSuccessModalCrossButtonClick}
       />
     </main>
   );

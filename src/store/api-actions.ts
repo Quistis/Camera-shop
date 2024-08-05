@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AxiosInstance } from 'axios';
+// import { toast } from 'react-toastify';
 import { AppDispatch, State } from '../types/state';
 import { TCamerasCard } from '../types/cameras';
 import { TReview } from '../types/reviews';
@@ -8,9 +9,11 @@ import { TImagePreview } from '../types/banners';
 
 type TOrder = {
   camerasIds: number[];
-  tel: string;
+  // tel: string;
   coupon: string | null;
 };
+
+type TReviewWithoutId = Omit<TReview, 'id' | 'createAt'>;
 
 export const fetchCameras = createAsyncThunk<TCamerasCard[], undefined, {
   dispatch: AppDispatch;
@@ -61,6 +64,23 @@ export const fetchReviewsById = createAsyncThunk<TReview[], string, {
   }
 );
 
+export const postReview = createAsyncThunk<TReview, TReviewWithoutId, {
+  dispatch: AppDispatch;
+  state: State;
+  extra: AxiosInstance;
+}>(
+  'reviews/postReview',
+  async (formData, {extra: api}) => {
+    // try {
+    const {data} = await api.post<TReview>(APIRoute.Reviews, formData);
+    return data;
+    // } catch (error) {
+    //   toast.warn('Произошла ошибка при отправке комментария');
+    //   throw error;
+    // }
+  }
+);
+
 export const fetchPromos = createAsyncThunk<TImagePreview[], undefined, {
   dispatch: AppDispatch;
   state: State;
@@ -80,9 +100,36 @@ export const postOrder = createAsyncThunk<void, TOrder, {
   extra: AxiosInstance;
 }>(
   'orders/postOrder',
-  async({tel, camerasIds, coupon}, {extra: api}) => {
+  async({camerasIds, coupon}, {extra: api}) => {
 
-    await api.post<void>(APIRoute.Order, {tel, camerasIds, coupon});
+    await api.post<void>(APIRoute.Order, {camerasIds, coupon});
 
   }
 );
+
+export const postCoupon = createAsyncThunk<number, string, {
+  dispatch: AppDispatch;
+  state: State;
+  extra: AxiosInstance;
+}>(
+  'orders/postCoupon',
+  async (coupon, { extra: api }) => {
+    const { data } = await api.post<number>(APIRoute.Coupon, { coupon });
+    return data;
+  }
+);
+
+// export const postCoupon = createAsyncThunk<number, coupon: string, {
+//   dispatch: AppDispatch;
+//   state: State;
+//   extra: AxiosInstance;
+// }>(
+//   'orders/postCoupon',
+//   async(coupon, {extra: api}) => {
+
+//     const data = await api.post<void>(APIRoute.Order, coupon);
+
+//     return data;
+
+//   }
+// );
