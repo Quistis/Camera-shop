@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, FormEvent, ChangeEvent, FocusEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import CartItem from '../../components/cart-item/cart-item';
 import RemoveCartItemModal from '../../components/remove-cart-item-modal/remove-cart-item-modal';
 import PostOrderModal from '../../components/post-order-modal/post-order-modal';
@@ -190,6 +191,11 @@ const CartPage = (): JSX.Element => {
 
   return (
     <main>
+      <Helmet>
+        <title>
+          Camera Shop. Корзина
+        </title>
+      </Helmet>
       <div className="page-content">
         <div className="breadcrumbs">
           <div className="container">
