@@ -4,10 +4,8 @@ import { useAppDispatch, useAppSelector } from '../../hooks';
 import { selectCartItems, addProductToCart } from '../../store/slices/cart';
 import { saveCartState } from '../../utils/cartLocalStorage';
 import FocusTrap from 'focus-trap-react';
-// import { toast } from 'react-toastify';
 import { TCamerasCard } from '../../types/cameras';
 
-//TODO: изменения тут, чтобы хранить количество,менять его и считать цену и тд
 type AddToCartModalProps = {
   product: TCamerasCard | null;
   isModalActive: boolean;
@@ -87,26 +85,7 @@ const AddToCartModal = ({product, isModalActive = false, onCrossButtonClick, onA
 
     }
   }, [onCrossButtonClick]);
-  //TODO: посмотреть на этот обработчик,второе условие вроде лишнее, мне не нужно добавлять продукт если он уже есть в массиве с таким ид
-  // const handleAddProduct = (productId: number, productPrice: number) => {
-  //   const updatedCartItems = [...cartItems, { id: productId, quantity: 1, price: productPrice }];
 
-  //   if (!cartItems.some((item) => item.id === id)) {
-  //     dispatch(addProductToCart({ id: productId, quantity: 1, price: productPrice }));
-  //     saveCartState(updatedCartItems);
-  //   // }
-  //   } else {
-  //     const existingItem = cartItems.find((item) => item.id === id);
-  //     if (existingItem) {
-  //       dispatch(addProductToCart({ id: productId, quantity: 1, price: productPrice }));
-  //       saveCartState(updatedCartItems);
-  //     }
-  //   }
-
-  //   if (onAddProductButtonClick) {
-  //     onAddProductButtonClick();
-  //   }
-  // };
   const handleAddProduct = (productId: number, productPrice: number) => {
     const existingItem = cartItems.find((item) => item.id === productId);
 
@@ -136,9 +115,6 @@ const AddToCartModal = ({product, isModalActive = false, onCrossButtonClick, onA
       }
     }
 
-    // if (onAddProductButtonClick) {
-    //   onAddProductButtonClick();
-    // }
   };
 
   return(

@@ -36,11 +36,7 @@ const CartItem = ({product, onCartItemRemoveButtonClick}: CartItemProps): JSX.El
 
   const [inputQuantity, setInputQuantity] = useState<number | string>(quantity);
 
-  //TODO: Эта штука должна открывать попап с подтверждением удаления позиции из корзины, доделать
   const handleCrossButtonClick = () => {
-    // const updatedItems = cartItems.filter((item) => item.id !== productId);
-    // saveCartState(updatedItems);
-    // dispatch(removeProductFromCart(productId));
     if (onCartItemRemoveButtonClick) {
       onCartItemRemoveButtonClick(product);
     }
@@ -133,10 +129,7 @@ const CartItem = ({product, onCartItemRemoveButtonClick}: CartItemProps): JSX.El
         <input
           type="number"
           id="counter1"
-          // defaultValue={inputQuantity}
           value={inputQuantity}
-          // min={1}
-          // max={9}
           aria-label="количество товара"
           onChange={handleInputChange}
           onBlur={handleQuantityInputBlur}

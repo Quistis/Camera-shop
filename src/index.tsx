@@ -8,14 +8,11 @@ import { setCartProducts } from './store/slices/cart';
 import { loadCartState } from './utils/cartLocalStorage';
 import App from './components/app/app';
 import 'react-toastify/dist/ReactToastify.css';
-//TODO: Изменения тут, чтобы хранить количество
+
 const cartItems = loadCartState();
 
-// store.dispatch(setCartProducts(cartItems));
 store.dispatch(fetchCameras())
   .then((response) => {
-    //Это нужно чтобы корзина заполнялась только если данные о товарах успешно загружены,
-    //чтобы не было ситуации когда товары не загрузили,а в корзине что-то есть
     if (response.meta.requestStatus === 'fulfilled') {
       store.dispatch(setCartProducts(cartItems));
     }

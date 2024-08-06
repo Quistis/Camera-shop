@@ -1,6 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AxiosInstance } from 'axios';
-// import { toast } from 'react-toastify';
 import { AppDispatch, State } from '../types/state';
 import { TCamerasCard } from '../types/cameras';
 import { TReview } from '../types/reviews';
@@ -9,7 +8,6 @@ import { TImagePreview } from '../types/banners';
 
 type TOrder = {
   camerasIds: number[];
-  // tel: string;
   coupon: string | null;
 };
 
@@ -71,13 +69,10 @@ export const postReview = createAsyncThunk<TReview, TReviewWithoutId, {
 }>(
   'reviews/postReview',
   async (formData, {extra: api}) => {
-    // try {
+
     const {data} = await api.post<TReview>(APIRoute.Reviews, formData);
     return data;
-    // } catch (error) {
-    //   toast.warn('Произошла ошибка при отправке комментария');
-    //   throw error;
-    // }
+
   }
 );
 
@@ -118,18 +113,3 @@ export const postCoupon = createAsyncThunk<number, string, {
     return data;
   }
 );
-
-// export const postCoupon = createAsyncThunk<number, coupon: string, {
-//   dispatch: AppDispatch;
-//   state: State;
-//   extra: AxiosInstance;
-// }>(
-//   'orders/postCoupon',
-//   async(coupon, {extra: api}) => {
-
-//     const data = await api.post<void>(APIRoute.Order, coupon);
-
-//     return data;
-
-//   }
-// );

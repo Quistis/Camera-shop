@@ -57,11 +57,6 @@ const AddToCartSuccessModal = ({isModalActive, onCrossButtonClick}: AddToCartSuc
   const handleCrossButtonClick = (evt: MouseEvent) => {
     evt.preventDefault();
 
-    // if (location.pathname !== '/') {
-    //   navigate(AppRoutes.Main);
-    // } else if (onCrossButtonClick) {
-    //   onCrossButtonClick();
-    // }
     if (onCrossButtonClick) {
       onCrossButtonClick();
     }
@@ -94,7 +89,6 @@ const AddToCartSuccessModal = ({isModalActive, onCrossButtonClick}: AddToCartSuc
             <div className="modal__buttons">
               <a
                 className="btn btn--transparent modal__btn"
-                // href="#"
                 onClick={handleContinueShoppingButtonClick}
                 ref={continueShoppingButtonRef}
               >

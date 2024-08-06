@@ -58,7 +58,6 @@ const calculateDiscount = (products: TCartItem[]): number => {
   return discountAmount;
 };
 
-//TODO: Изменения тут для подсчета кол-ва,цены и тд, тут в переменной cartCards тот же самый тип что и TCamerasCard, только есть поле quantity, надо сделать под него тип
 const CartPage = (): JSX.Element => {
 
   const dispatch = useAppDispatch();
@@ -99,10 +98,8 @@ const CartPage = (): JSX.Element => {
   const couponDiscountAmount = Math.round((totalPrice / 100) * couponDiscount);
   const finalDiscountAmount = discountAmount + couponDiscountAmount;
   const finalPrice = totalPrice - finalDiscountAmount;
-  // const finalPrice = totalPrice - discountAmount;
 
   useEffect(() => {
-    // Прокрутка страницы наверх при монтировании компонента
     window.scrollTo(0, 0);
   }, []);
 
@@ -115,29 +112,6 @@ const CartPage = (): JSX.Element => {
     }
   }, [dispatch, cardsErrorStatus]);
 
-  // useEffect(() => {
-  //   if (couponDiscount !== 0 && postCouponButtonRef.current) {
-  //     postCouponButtonRef.current.disabled = true;
-  //   }
-
-  //   if (couponDiscount !== 0 && couponInputRef.current) {
-  //     couponInputRef.current.disabled = true;
-
-  //     const couponCode = loadCouponState().couponCode || '';
-  //     couponInputRef.current.placeholder = `Купон: ${couponCode}`;
-
-  //     setCouponInput('');
-
-  //   }
-  // }, [couponDiscount, couponInput]);
-
-  //TODO: Избавиться от этой штуки, мы можем попадать в корзину если она пуста, переход нужно делать, только
-  // useEffect(() => {
-  //   if (cartItems.length === 0) {
-  //     navigate(AppRoutes.Main);
-  //     toast.warn('Корзина пуста, переходим в каталог');
-  //   }
-  // }, [cartItems.length, navigate]);
 
   const handleRemoveCartItemButtonClick = (product?: TCamerasCard) => {
     if (product) {
@@ -149,7 +123,7 @@ const CartPage = (): JSX.Element => {
   const handleCrossButtonClick = () => {
     setIsModalActive(false);
   };
-  //TODO: Доработать, нужно показывать модальное окно по нажатию,а не просто отправлять запрос на сервер
+
   const handlePostOrder = () => {
 
     const couponCode = localStorage.getItem('couponCode') ? localStorage.getItem('couponCode') : null;
@@ -169,9 +143,6 @@ const CartPage = (): JSX.Element => {
             localStorage.clear();
           }, 2000);
 
-          // dispatch(setCartProducts([]));
-          // dispatch(setCouponDiscount(0));
-          // localStorage.clear();
         }
       });
 
@@ -184,18 +155,15 @@ const CartPage = (): JSX.Element => {
   const handleCouponCodeChange = (evt: ChangeEvent<HTMLInputElement>) => {
     const value = evt.target.value.replace(/\s/g, '');
     setCouponInput(value);
-    //Это мб надо будет убрать
     setCouponStatus(null);
   };
 
   const handleCouponInputBlur = (evt: FocusEvent<HTMLInputElement>) => {
     const value = evt.target.value.replace(/\s/g, '');
     setCouponInput(value);
-    //Это мб надо будет убрать
     setCouponStatus(null);
   };
 
-  //TODO: доработать обработчик отправки купона. пока что сделал его чтобы просто проверить что экшн работает корректно
   const handlePostCouponSubmit = (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
     dispatch(postCoupon(couponInputValue))
@@ -204,15 +172,12 @@ const CartPage = (): JSX.Element => {
         const couponDiscountValue = response.payload as number;
 
         if (response.meta.requestStatus === 'fulfilled') {
-          //Значение скидки по купону мб не нужно,я и так записываю его в редух
-          // const couponDiscountValue = response.payload as number; // Assuming the discount value is returned as payload
+
           setCouponStatus('valid');
           saveCouponState(couponInputValue, couponDiscountValue);
-          // dispatch(setCouponDiscount(couponDiscountValue));
-          // Additional logic to apply the discount can be added here
+
         } else {
           setCouponStatus('invalid');
-          //Пока что не уверен что нужно затирать старые данные, при вводе нового промокода
           saveCouponState('', 0);
           dispatch(setCouponDiscount(0));
         }
@@ -287,7 +252,6 @@ const CartPage = (): JSX.Element => {
                       ref={postCouponButtonRef}
                       className="btn"
                       type="submit"
-                      // onSubmit={handlePostCouponButtonClick}
                     >
                       Применить
                     </button>

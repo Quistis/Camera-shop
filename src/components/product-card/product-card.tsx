@@ -69,13 +69,6 @@ const ProductCard = memo(({card, onClick, isActive, className}: ProductCardsProp
           >
             Купить
           </button>}
-        {/* <button
-          className="btn btn--purple product-card__btn"
-          type="button"
-          onClick={handleProductCardButtonClick}
-        >
-          Купить
-        </button> */}
         <Link className="btn btn--transparent" to={`/camera/${id}`}>
           Подробнее
         </Link>

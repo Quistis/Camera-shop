@@ -18,9 +18,7 @@ const UiBlocker = ({isActive}: UiBlockerProps): JSX.Element => {
     <div className={`modal ${isActive ? 'is-active' : ''} modal--narrow`}>
       <div className="modal__wrapper">
         <div className="modal__overlay"/>
-        {/* <div className="modal__content modal--min-sizes"> */}
         <div className="loader"></div>
-        {/* </div> */}
       </div>
     </div>
   );

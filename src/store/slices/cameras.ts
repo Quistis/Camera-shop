@@ -87,7 +87,7 @@ export const CamerasSlice = createSlice({
       })
 
       .addCase(postReview.fulfilled, (state, action: PayloadAction<TReview>) => {
-        // Обновляем reviewsCount и добавляем отзыв в массив отзывов текущего продукта
+
         if (state.currentProduct.data && state.currentProduct.data.id === action.payload.cameraId) {
           state.currentProduct.data.reviewCount += 1;
         }
